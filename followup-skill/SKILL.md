@@ -15,15 +15,17 @@ Morning run  → checks listings, sends Telegram with 🔔 IMPORTANT + numbered 
 
 David (phone) → replies in Telegram: "Carter 1"
 
-This skill  → reads pending_actions.json (if empty: exits quietly)
-(1hr later)  → reads David's Telegram replies via Chrome JS
+This skill  → reads David's Telegram replies via Chrome JS (EXIT if none)
+(1hr later)  → reads pending_actions.json to find what each reply maps to
+             → if pending is empty but David replied → alert David (don't silently exit)
              → matches "Carter 1" to the reply text for option 1
              → opens the FB/eBay thread, sends the reply
              → resolves the item from pending_actions.json
+             → acknowledges Telegram (ONLY after acting — never before)
              → sends Telegram confirmation
 ```
 
-If nothing is pending, or David hasn't replied, exit cleanly — no Telegram message needed.
+**Critical rule:** Never acknowledge Telegram updates until after the replies have been sent in the browser. If something fails mid-run, David's messages stay in the Telegram queue and will be picked up on the next run.
 
 ---
 
@@ -37,23 +39,17 @@ Store this path as WORKSPACE for all subsequent steps.
 
 ---
 
-## Step 2 — Check for Pending Actions
+## Step 2 — Fetch David's Recent Telegram Replies via Chrome
 
-Read `[WORKSPACE]/notifications/pending_actions.json`.
+**Do this first — before checking pending_actions.json.** David's replies live in the Telegram queue and must be read before anything else. Only acknowledge them (Step 6b) after the browser replies have been sent.
 
-If the file doesn't exist, or `"pending"` is an empty list → **stop here**. Exit cleanly with no Telegram message. There's nothing to act on.
+Python can't reach `api.telegram.org` from the Cowork sandbox (proxy blocks it). Use Chrome JS instead.
 
----
+**2a.** Read `TELEGRAM_BOT_TOKEN` from `[WORKSPACE]/notifications/.env`.
 
-## Step 3 — Fetch David's Recent Telegram Replies via Chrome
+**2b.** Navigate Chrome to `https://example.com` — this clears any CSP restrictions from FB or eBay pages that would block the outbound fetch.
 
-Python can't reach `api.telegram.org` from the Cowork sandbox (proxy blocks it). Use Chrome JS instead — the same pattern used for sending.
-
-**3a.** Read `TELEGRAM_BOT_TOKEN` from `[WORKSPACE]/notifications/.env`.
-
-**3b.** Navigate Chrome to `https://example.com` — this clears any CSP restrictions from FB or eBay pages that would block the outbound fetch.
-
-**3c.** Run this JavaScript via the Chrome JS tool (substitute the real token):
+**2c.** Run this JavaScript via the Chrome JS tool (substitute the real token):
 
 ```javascript
 (async () => {
@@ -66,13 +62,13 @@ Python can't reach `api.telegram.org` from the Cowork sandbox (proxy blocks it).
 })()
 ```
 
-**3d.** Save the returned JSON string to a temp file:
+**2d.** Save the returned JSON string to a temp file (always overwrite — never use a stale file from a previous run):
 
 ```bash
 echo '<JSON_STRING>' > /tmp/tg_updates.json
 ```
 
-**3e.** Parse it with Python to extract David's recent messages:
+**2e.** Parse it with Python to extract David's recent messages:
 
 ```bash
 source [WORKSPACE]/.venv/bin/activate
@@ -81,14 +77,24 @@ import json, sys
 sys.path.insert(0, '[WORKSPACE]')
 from notifications.telegram_reader import parse_updates_response
 raw = open('/tmp/tg_updates.json').read()
-msgs = parse_updates_response(raw, hours=2)
+msgs = parse_updates_response(raw, hours=6)
 print(json.dumps(msgs, default=str))
 EOF
 ```
 
-If the output is `[]` → **stop here**. David hasn't replied yet. Exit cleanly, no Telegram message.
+If the output is `[]` → **stop here**. David hasn't replied yet. Exit cleanly with no Telegram message.
 
 Store the parsed list as MESSAGES.
+
+---
+
+## Step 3 — Check Pending Actions
+
+Now read `[WORKSPACE]/notifications/pending_actions.json`.
+
+- If `"pending"` has items → proceed to Step 4 (matching).
+- If `"pending"` is **empty but MESSAGES is non-empty** → David replied to something but `pending_actions.json` has no context. **Do not silently exit.** Send David a Telegram message: `"⚠️ Got your reply but no pending actions on file — the morning run may not have completed. Running a fresh check now."` Then trigger the manage-listings skill to re-run.
+- If both are empty → exit cleanly with no Telegram message.
 
 ---
 
@@ -110,7 +116,7 @@ print(json.dumps(matched, default=str))
 EOF
 ```
 
-If the output is `[]` → **stop here**. No replies matched any pending action (David may have replied with something unrecognized). Exit cleanly.
+If the output is `[]` → David replied but the format didn't match any pending key (e.g. typo). Send David a Telegram message: `"⚠️ Couldn't match your reply to any pending action. Pending keys: [list keys from pending_actions.json]. Reply format: 'Key Number' (e.g. 'Carter 1')."` Then exit.
 
 Store the result as MATCHED.
 
@@ -145,7 +151,7 @@ sys.path.insert(0, '[WORKSPACE]')
 from notifications.telegram_reader import parse_updates_response
 from notifications.reply_handler import match_replies, resolve_actions
 
-msgs = parse_updates_response(open('/tmp/tg_updates.json').read(), hours=2)
+msgs = parse_updates_response(open('/tmp/tg_updates.json').read(), hours=6)
 matched = match_replies(msgs)
 resolved_keys = [m["action"]["key"] for m in matched if m["reply_text"] != "__HOLD__"]
 if resolved_keys:
@@ -154,7 +160,7 @@ if resolved_keys:
 EOF
 ```
 
-**6b.** Acknowledge Telegram updates via Chrome JS so David's replies don't reappear in the next run. Get the highest `update_id` from MESSAGES, then run:
+**6b.** Acknowledge Telegram updates via Chrome JS — **only after browser replies are confirmed sent** (screenshots taken in Step 5). This removes David's messages from the Telegram queue so they don't reappear. If Step 5 failed for any item, do NOT acknowledge — the failed item needs to stay in the queue for the next run. Get the highest `update_id` from MESSAGES, then run:
 
 ```javascript
 (async () => {

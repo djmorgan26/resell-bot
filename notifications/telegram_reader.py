@@ -36,17 +36,29 @@ _env_path = Path(__file__).parent / ".env"
 load_dotenv(dotenv_path=_env_path)
 
 
-def parse_updates_response(raw_json: str, hours: float = 2.0) -> list[dict]:
+def parse_updates_response(
+    raw_json: str,
+    hours: float = 2.0,
+    chat_id: str | int | None = None,
+) -> list[dict]:
     """
     Parse a raw Telegram getUpdates API response (already fetched, e.g. via Chrome JS).
 
     Use this in the Cowork sandbox where Python cannot reach api.telegram.org directly.
     Pass the raw JSON string returned by the Chrome JS fetch call.
 
+    Args:
+        raw_json: Raw JSON string from Telegram getUpdates API.
+        hours: Only return messages from the last N hours.
+        chat_id: If provided, only return messages from this chat.
+                 Pass TELEGRAM_CHAT_ID from .env to filter to the group chat only.
+                 If None, returns messages from ALL chats (legacy behavior).
+
     Returns the same format as get_recent_messages():
       - text (str): message text
       - timestamp (datetime, UTC): when it was sent
       - update_id (int): Telegram update ID for acknowledgement
+      - chat_id (int): the chat the message came from
     """
     data = json.loads(raw_json) if isinstance(raw_json, str) else raw_json
 
@@ -54,11 +66,17 @@ def parse_updates_response(raw_json: str, hours: float = 2.0) -> list[dict]:
         raise RuntimeError(f"Telegram API error: {data}")
 
     cutoff = datetime.now(timezone.utc) - timedelta(hours=hours)
+    target_chat_id = str(chat_id) if chat_id is not None else None
     messages = []
 
     for update in data.get("result", []):
         msg = update.get("message") or update.get("channel_post")
         if not msg:
+            continue
+
+        # Filter by chat — only process messages from the target group chat
+        msg_chat_id = str(msg.get("chat", {}).get("id", ""))
+        if target_chat_id and msg_chat_id != target_chat_id:
             continue
 
         # Skip bot messages
@@ -79,6 +97,7 @@ def parse_updates_response(raw_json: str, hours: float = 2.0) -> list[dict]:
             "text": text,
             "timestamp": ts,
             "update_id": update["update_id"],
+            "chat_id": int(msg_chat_id) if msg_chat_id else None,
         })
 
     return messages
@@ -91,12 +110,16 @@ def get_recent_messages(hours: float = 2.0) -> list[dict]:
     NOTE: This will fail in the Cowork sandbox VM (Python can't reach api.telegram.org).
     Use parse_updates_response() with a Chrome JS fetch instead for scheduled runs.
 
+    Automatically filters to the group chat (TELEGRAM_CHAT_ID from .env).
+
     Each returned dict has:
       - text (str): message text
       - timestamp (datetime, UTC): when it was sent
       - update_id (int): Telegram update ID for acknowledgement
+      - chat_id (int): the chat the message came from
     """
     token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
     if not token:
         raise RuntimeError("Missing TELEGRAM_BOT_TOKEN in notifications/.env")
 
@@ -111,7 +134,7 @@ def get_recent_messages(hours: float = 2.0) -> list[dict]:
     response.raise_for_status()
     data = response.json()
 
-    return parse_updates_response(data, hours=hours)
+    return parse_updates_response(data, hours=hours, chat_id=chat_id)
 
 
 def acknowledge_updates(max_update_id: int) -> None:

@@ -73,14 +73,19 @@ echo '<JSON_STRING>' > /tmp/tg_updates.json
 ```bash
 source [WORKSPACE]/.venv/bin/activate
 python3 - << 'EOF'
-import json, sys
+import json, sys, os
+from dotenv import load_dotenv
 sys.path.insert(0, '[WORKSPACE]')
+load_dotenv('[WORKSPACE]/notifications/.env')
 from notifications.telegram_reader import parse_updates_response
 raw = open('/tmp/tg_updates.json').read()
-msgs = parse_updates_response(raw, hours=6)
+chat_id = os.getenv('TELEGRAM_CHAT_ID')
+msgs = parse_updates_response(raw, hours=6, chat_id=chat_id)
 print(json.dumps(msgs, default=str))
 EOF
 ```
+
+**Important:** The `chat_id` filter ensures we only read messages from the group chat, not from personal DMs to the bot. This prevents the bot from acting on messages sent in the wrong chat.
 
 If the output is `[]` → **stop here**. David hasn't replied yet. Exit cleanly with no Telegram message.
 
@@ -145,13 +150,17 @@ For each item in MATCHED:
 **6a.** Remove resolved items from `pending_actions.json`:
 
 ```bash
+source [WORKSPACE]/.venv/bin/activate
 python3 - << 'EOF'
-import sys
+import sys, os
+from dotenv import load_dotenv
 sys.path.insert(0, '[WORKSPACE]')
+load_dotenv('[WORKSPACE]/notifications/.env')
 from notifications.telegram_reader import parse_updates_response
 from notifications.reply_handler import match_replies, resolve_actions
 
-msgs = parse_updates_response(open('/tmp/tg_updates.json').read(), hours=6)
+chat_id = os.getenv('TELEGRAM_CHAT_ID')
+msgs = parse_updates_response(open('/tmp/tg_updates.json').read(), hours=6, chat_id=chat_id)
 matched = match_replies(msgs)
 resolved_keys = [m["action"]["key"] for m in matched if m["reply_text"] != "__HOLD__"]
 if resolved_keys:
@@ -226,10 +235,14 @@ These rules carry over from the main listing skill:
 
 ## Troubleshooting
 
+**Bot can't see David's messages in the group chat:** The bot's Privacy Mode must be OFF. Check with the `getMe` API — `can_read_all_group_messages` must be `true`. If it's `false`, go to @BotFather → `/mybots` → select the bot → Bot Settings → Group Privacy → Turn off. **The bot must also be removed and re-added to the group after changing this setting** for it to take effect.
+
 **Chrome JS fetch returns an error / non-ok Telegram response:** Check that the token in `.env` is still valid. Telegram bot tokens occasionally get regenerated.
 
 **`match_replies()` returns empty even though David replied:** The key in his reply must match the `"key"` field in `pending_actions.json` (case-insensitive, single word). If David typed "carter1" instead of "carter 1", it won't match — the format must be `"Word Number"`.
 
 **Browser can't find the message box on FB/eBay:** Take a screenshot first to see the current state of the page. Log in if the session has expired.
 
-**`/tmp/tg_updates.json` is stale from a previous run:** Always overwrite it in Step 3d before using it in later steps.
+**`/tmp/tg_updates.json` is stale from a previous run:** Always overwrite it in Step 2d before using it in later steps.
+
+**Messages showing up from personal chat instead of group:** The `parse_updates_response` function accepts a `chat_id` parameter — always pass `TELEGRAM_CHAT_ID` from `.env` to filter to the group chat only. Without this, the bot reads messages from ALL chats including DMs.

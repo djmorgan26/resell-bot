@@ -3,4 +3,6 @@ Check for David's Telegram replies and act on any pending listing decisions.
 Find the workspace by running:
   find /sessions -name "resell_inventory.xlsx" 2>/dev/null | head -1 | xargs dirname
 
+chrome browser tools are available.  Use tool to start new browser tab.
+
 Then read and follow [WORKSPACE]/followup-skill/SKILL.md.

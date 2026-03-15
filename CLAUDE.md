@@ -88,6 +88,22 @@ python3 resell-skill/scripts/convert_heic.py /path/to/photos/ /path/to/output/
 
 Confirm Chrome is active before the first scheduled run. Notifications are sent via Telegram (see `notifications/` — no email MCP needed for sending).
 
+### Fixing Chrome timeouts
+
+If Chrome MCP tools time out (every call returns "did not respond in time"), do this in order:
+
+1. Call `switch_browser` with `browser: "chrome"` — this reconnects the MCP to the Chrome extension.
+2. Call `tabs_context_mcp` with `createIfEmpty: true` (boolean) — this creates a new tab group and returns a valid `tabId`.
+3. Use that `tabId` (as a number) in all subsequent Chrome tool calls.
+
+```
+switch_browser(browser: "chrome")
+tabs_context_mcp(createIfEmpty: true)   → returns tabId e.g. 73648610
+navigate(url: "https://...", tabId: 73648610)
+```
+
+This resolved a full Chrome timeout loop in a scheduled run on 2026-03-15.
+
 ---
 
 ## Telegram notifications

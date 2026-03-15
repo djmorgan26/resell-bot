@@ -96,10 +96,10 @@ The `notifications/` subdirectory is a self-contained service for sending Telegr
 
 ```
 notifications/
-├── .env              ← Azure SP credentials (gitignored, must be copied manually to each machine)
+├── .env              ← Telegram credentials (gitignored, copy manually to each machine)
 ├── .env.example      ← template — shows what keys are required
 ├── telegram.py       ← raw Telegram Bot API call
-└── notifier.py       ← main interface: loads .env → Key Vault → Telegram
+└── notifier.py       ← main interface: loads .env → Telegram
 ```
 
 **Setup on a new machine:**
@@ -110,7 +110,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 # Then copy your .env into notifications/
 cp notifications/.env.example notifications/.env
-# Fill in the Azure credentials
+# Fill in TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID
 ```
 
 **Usage from any script in this repo:**
@@ -120,9 +120,9 @@ from notifications.notifier import notify
 notify("PS5 listing got a new offer: $380 — check it out")
 ```
 
-Credentials flow: `.env` → Azure Service Principal → Key Vault → Telegram bot token + chat ID → message sent.
+Credentials flow: `.env` → Telegram bot token + chat ID → message sent directly via Telegram Bot API.
 
-The `.env` is gitignored and must be copied manually between machines (contains the Azure SP secret).
+The `.env` is gitignored and must be copied manually between machines.
 
 ---
 

@@ -11,5 +11,3 @@ pillow-heif>=0.13.0
 # Telegram notifications (notifications/)
 requests>=2.31.0
 python-dotenv>=1.0.0
-azure-identity>=1.15.0
-azure-keyvault-secrets>=4.7.0

@@ -8,18 +8,14 @@ Usage from any script in this repo:
     notify("Your PS5 listing got a new offer: $380")
 
 Credentials flow:
-  1. Azure Service Principal credentials are read from notifications/.env
-  2. Those are used to authenticate to Azure Key Vault
-  3. Key Vault returns the Telegram bot token and chat ID
-  4. Message is sent directly via the Telegram Bot API (no LLM formatting)
+  1. TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID are read directly from notifications/.env
+  2. Message is sent via the Telegram Bot API
 """
 
 import logging
 import os
 from pathlib import Path
 
-from azure.identity import DefaultAzureCredential
-from azure.keyvault.secrets import SecretClient
 from dotenv import load_dotenv
 
 from notifications import telegram
@@ -30,20 +26,21 @@ logger = logging.getLogger(__name__)
 _env_path = Path(__file__).parent / ".env"
 load_dotenv(dotenv_path=_env_path)
 
-KEY_VAULT_URL = "https://personal-key-vault1.vault.azure.net/"
-
 _token: str | None = None
 _chat_id: str | None = None
 
 
 def _load_secrets() -> None:
-    """Fetch Telegram credentials from Azure Key Vault (runs once, then cached)."""
+    """Read Telegram credentials from .env file."""
     global _token, _chat_id
-    credential = DefaultAzureCredential(additionally_allowed_tenants=["*"])
-    client = SecretClient(vault_url=KEY_VAULT_URL, credential=credential)
-    _token = client.get_secret("TELEGRAM-BOT-TOKEN").value
-    _chat_id = client.get_secret("TELEGRAM-CHAT-ID").value
-    logger.debug("Telegram credentials loaded from Key Vault.")
+    _token = os.getenv("TELEGRAM_BOT_TOKEN")
+    _chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    if not _token or not _chat_id:
+        raise RuntimeError(
+            "Missing Telegram credentials. "
+            "Set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID in notifications/.env"
+        )
+    logger.debug("Telegram credentials loaded from .env.")
 
 
 def notify(message: str) -> None:

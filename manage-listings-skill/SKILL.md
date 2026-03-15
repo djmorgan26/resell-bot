@@ -29,6 +29,8 @@ You are monitoring the user's active marketplace listings and handling routine i
 2. **Notifications** — Check for "interested" or "is this still available?" messages.
 3. **Listing status** — Verify listings are still active and visible.
 
+**Important:** Only process messages tied to items that are currently `listed` in the inventory (Status = "listed"). Skip any message thread where the linked listing shows "No longer available", the item is sold, or the item does not appear in the active inventory. Do not reply to, log, or flag those conversations.
+
 ## How to Check (Browser-Assisted Mode)
 
 If Claude in Chrome tools are available:
@@ -99,11 +101,13 @@ When an offer comes in:
 3. Do NOT accept or decline the offer — wait for the user
 
 ### "Is this still available?" Messages
-**Priority: LOW — Handle autonomously**
+**Priority: LOW — Handle autonomously, active listings only**
 
-These are extremely common on Facebook Marketplace. Respond promptly:
+These are extremely common on Facebook Marketplace. Only respond if the item is currently `listed` in the inventory:
 - "Yes, it's still available! Let me know if you have any questions or would like to arrange a pickup."
 - Log the interaction
+
+If the linked listing shows "No longer available" or the item is not in the active inventory, **skip it entirely** — do not reply, do not log, do not flag.
 
 ### Low Engagement / Stale Listings
 **Priority: LOW — Include in summary report**

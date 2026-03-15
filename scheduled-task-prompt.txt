@@ -1,0 +1,15 @@
+Run the daily marketplace listing check.
+
+STEP 1 — Find the workspace:
+  find /sessions -name "resell_inventory.xlsx" 2>/dev/null | head -1 | xargs dirname
+Store the result as WORKSPACE.
+
+STEP 2 — Read the skill:
+  [WORKSPACE]/manage-listings-skill/SKILL.md
+This file defines the full workflow, behavioral rules, and how to handle every scenario. Follow it exactly.
+
+STEP 3 — Read the inventory:
+  [WORKSPACE]/resell_inventory.xlsx
+All active listings, their URLs, listed prices, and pricing floors are in this file. Use the rows where Status = "listed" as your check list. Do not rely on any hardcoded listing data — the spreadsheet is the source of truth.
+
+STEP 4 — Run the check and update the inventory when done.

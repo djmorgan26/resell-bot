@@ -1,8 +1,15 @@
 # resell-bot Python dependencies
+# Install: python3 -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt
 
-# Inventory spreadsheet management (update_inventory.py)
+# Inventory spreadsheet management (resell-skill/scripts/update_inventory.py)
 openpyxl>=3.1.0
 
-# HEIC photo conversion (convert_heic.py)
+# HEIC photo conversion (resell-skill/scripts/convert_heic.py)
 Pillow>=10.0.0
 pillow-heif>=0.13.0
+
+# Telegram notifications (notifications/)
+requests>=2.31.0
+python-dotenv>=1.0.0
+azure-identity>=1.15.0
+azure-keyvault-secrets>=4.7.0

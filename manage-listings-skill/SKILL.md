@@ -1,6 +1,6 @@
 ---
 name: manage-listings
-description: "Monitor and manage active marketplace listings on eBay and Facebook Marketplace. Use this skill on a daily schedule or when the user asks to check on their listings, respond to buyer messages, review offers, or see if anything has sold. This skill checks all active listings for new activity — messages, questions, offers, sales — drafts responses, and emails the user when something needs attention (like a sale or a question only they can answer). It never finalizes sales, accepts offers, or makes binding commitments without explicit user approval. Trigger when the user mentions: check my listings, any offers, did anything sell, manage listings, listing status, buyer messages, marketplace notifications, or respond to buyers."
+description: "Monitor and manage active marketplace listings on eBay and Facebook Marketplace. Use this skill on a daily schedule or when the user asks to check on their listings, respond to buyer messages, review offers, or see if anything has sold. This skill checks all active listings for new activity — messages, questions, offers, sales — drafts responses, and notifies the user via Telegram when something needs attention (like a sale or a question only they can answer). It never finalizes sales, accepts offers, or makes binding commitments without explicit user approval. Trigger when the user mentions: check my listings, any offers, did anything sell, manage listings, listing status, buyer messages, marketplace notifications, or respond to buyers."
 ---
 
 # Manage Listings: Marketplace Monitoring & Response
@@ -10,7 +10,7 @@ You are monitoring the user's active marketplace listings and handling routine i
 ## Core Principles
 
 1. **Never finalize a sale or accept an offer without the user.** You can draft responses, counter-offer suggestions, and recommendations, but the user makes all binding decisions.
-2. **Email the user when something important happens.** A sold item, a serious offer, or a question you can't answer yourself — these warrant an email.
+2. **Notify the user via Telegram when something important happens.** A sold item, a serious offer, or a question you can't answer yourself — these go in the IMPORTANT section of the Telegram summary.
 3. **Handle routine questions autonomously.** If a buyer asks about dimensions, condition, shipping, or something already covered in the listing, draft and queue a helpful response.
 4. **Update the inventory tracker** after every check so there's always a current record.
 5. **Be friendly and professional** in all drafted responses — the user's reputation depends on it.
@@ -47,37 +47,17 @@ If Claude in Chrome tools are available:
 ## Handling Different Scenarios
 
 ### Item Sold
-**Priority: HIGH — Email the user immediately**
+**Priority: HIGH — Flag in the Telegram IMPORTANT section immediately**
 
 When you detect a sale:
 1. Record the sale details (item, price, buyer, date)
 2. Update the inventory tracker: set status to "sold", record sold price and date
-3. Email the user with subject: "🎉 [Item Name] Sold for $[Price]!"
-4. Include in the email:
+3. Add to the IMPORTANT section of the Telegram summary:
    - What sold and for how much
    - Buyer's username
    - Shipping deadline (eBay typically gives 3 business days)
-   - Any next steps they need to take (ship the item, print label)
-5. Do NOT mark the item as shipped or print shipping labels — the user handles fulfillment
-
-**Email template:**
-```
-Subject: Item Sold — [Item Name] for $[Price]
-
-Hi David,
-
-Your [Item Name] just sold on [Marketplace] for $[Price]!
-
-Buyer: [username]
-Ship by: [deadline]
-
-Next steps:
-- Package the item
-- Print the shipping label from [marketplace]
-- Ship within the deadline
-
-I've updated your inventory tracker. Let me know if you need help with anything.
-```
+   - Next steps (package item, print label, ship within deadline)
+4. Do NOT mark the item as shipped or print shipping labels — the user handles fulfillment
 
 ### Buyer Question (Answerable from listing info)
 **Priority: LOW — Handle autonomously**
@@ -96,19 +76,19 @@ If a buyer asks something covered by the listing (dimensions, condition, what's 
 Example: "Hi! Great question — the Singer Featherweight comes with the original case, foot pedal, and a tray of accessories including bobbins and an extra throat plate. Everything is in working condition. Happy to answer any other questions!"
 
 ### Buyer Question (Needs user input)
-**Priority: MEDIUM — Email the user**
+**Priority: MEDIUM — Flag in the Telegram IMPORTANT section**
 
 If a buyer asks something you can't confidently answer (negotiating on price, questions about item history, technical questions beyond what's in the listing):
-1. Email the user with the question and your suggested response
+1. Add to the IMPORTANT section of the Telegram summary: the exact question and your suggested response
 2. Wait for the user to approve or modify the response
 3. Do not respond to the buyer until the user approves
 
 ### Offer Received
-**Priority: MEDIUM — Email the user with recommendation**
+**Priority: MEDIUM — Flag in the Telegram IMPORTANT section with recommendation**
 
 When an offer comes in:
 1. Compare the offer to the listed price and the pricing tiers from the inventory
-2. Draft an email to the user with:
+2. Add to the IMPORTANT section of the Telegram summary:
    - The offer amount and who made it
    - How it compares to the listing price (e.g., "85% of asking")
    - Your recommendation (accept, counter, decline) based on:
@@ -133,35 +113,15 @@ If a listing has been active for more than 7 days with low views/watchers:
 - Suggest a price reduction or listing refresh
 - The user decides whether to act on this
 
-## Email Communication
+## Notifications
 
-Use the Gmail MCP tools to send emails to both davidjmorgan26@gmail.com and lynnlmorgan64@gmail.com. Always include both addresses on every notification — send to one and CC the other, or address the email to both. Emails should be:
+All notifications go via Telegram. Gmail MCP is read-only and cannot send messages.
 
-- **Concise** — Busy people skim emails. Lead with the important info.
-- **Actionable** — Always include clear next steps.
-- **Batched when possible** — If checking multiple platforms, send one summary email rather than five separate ones (unless something is truly urgent like a sale).
+Every run ends with a Telegram summary — follow `[WORKSPACE]/notifications/SKILL.md` for the exact format. That skill defines:
+- The **IMPORTANT** section: urgent items needing David's action (sales, offers, unanswerable questions)
+- The **Active Listings table**: current state of all listed items
 
-### Daily Summary Email (if there's any activity)
-
-If running on a daily schedule and there's anything to report, send a single summary:
-
-```
-Subject: Listing Update — [Date]
-
-Hi David,
-
-Here's what's happening with your listings:
-
-[SOLD section — if anything sold]
-[OFFERS section — if any new offers]
-[MESSAGES section — if any buyer questions]
-[ENGAGEMENT section — brief note on views/watchers]
-[SUGGESTIONS section — any recommended actions]
-
-Your inventory tracker has been updated.
-```
-
-Only send the daily summary if there's actual activity to report. No news = no email.
+The Telegram message is always sent at the end of every run, regardless of whether anything urgent happened.
 
 ## Inventory Tracker Updates
 
@@ -201,10 +161,10 @@ When running as a scheduled task (cron), the workflow is:
 1. Read the inventory tracker to get the list of active listings
 2. For each active listing, check the marketplace for activity
 3. Handle routine interactions (answer simple questions, respond to "still available?")
-4. Draft emails for anything requiring user attention (sales, offers, complex questions)
-5. Send summary email if there's any activity
+4. Flag urgent items (sales, offers, unanswerable questions) for the Telegram IMPORTANT section
 6. Update the inventory tracker
-7. Exit cleanly
+7. Send Telegram summary — read and follow `[WORKSPACE]/notifications/SKILL.md`
+8. Exit cleanly
 
 The whole check should complete in a few minutes. If a marketplace is unreachable, note it and move on — don't retry indefinitely.
 

@@ -1,15 +1,33 @@
 Run the daily marketplace listing check.
 
+ENVIRONMENT:
+- Chrome browser is available — use it to check eBay and Facebook Marketplace
+- The resell-bot workspace is mounted and accessible
+- Python .venv is at [WORKSPACE]/.venv
+
+---
+
 STEP 1 — Find the workspace:
   find /sessions -name "resell_inventory.xlsx" 2>/dev/null | head -1 | xargs dirname
 Store the result as WORKSPACE.
 
-STEP 2 — Read the skill:
+STEP 2 — Read the manage-listings skill:
   [WORKSPACE]/manage-listings-skill/SKILL.md
-This file defines the full workflow, behavioral rules, and how to handle every scenario. Follow it exactly.
+This defines the full workflow, behavioral rules, and how to handle every scenario (sales, offers, buyer questions, stale listings). Follow it exactly.
 
 STEP 3 — Read the inventory:
   [WORKSPACE]/resell_inventory.xlsx
-All active listings, their URLs, listed prices, and pricing floors are in this file. Use the rows where Status = "listed" as your check list. Do not rely on any hardcoded listing data — the spreadsheet is the source of truth.
+Only check rows where Status = "listed". These are your active listings — get their URLs, listed prices, and pricing floors from the spreadsheet. Do not rely on hardcoded data.
 
-STEP 4 — Run the check and update the inventory when done.
+STEP 4 — Run the check:
+Use Chrome to visit each listing URL and check for activity:
+- eBay: sold items, messages, offers, watchers, expiring listings
+- Facebook Marketplace: messages, "is this still available?" inquiries, listing status
+Handle routine interactions per the skill. Flag anything needing David's attention for the Telegram IMPORTANT section.
+
+STEP 5 — Update the inventory:
+Update resell_inventory.xlsx to reflect anything that changed (status, notes, last checked date).
+
+STEP 6 — Send the Telegram summary:
+Read and follow [WORKSPACE]/notifications/SKILL.md
+This skill defines exactly how to format and send the post-run Telegram message to David.

@@ -88,20 +88,24 @@ pip install -r requirements.txt
 
 ---
 
-### Step 3 — Run the setup wizard
+### Step 3 — Configure resell-bot
 
+Pick whichever approach works best for you:
+
+**Option A — Terminal wizard** (fastest)
 ```bash
 python3 setup.py
 ```
+Asks you questions and handles everything automatically. Takes about 5 minutes.
 
-The wizard will ask you a few questions and walk you through:
-- Creating your `config.yaml` (name, eBay username, selling preferences)
-- Creating a Telegram bot and getting your credentials
-- Writing `notifications/.env`
-- Setting up your inventory spreadsheet
-- Sending a test notification to verify everything works
+**Option B — AI-guided setup** (if you prefer a conversational walkthrough)
+Open `setup-with-ai.md` and paste it into any AI assistant (Claude, ChatGPT, Gemini, etc.). The AI will walk you through each step one at a time.
 
-Takes about 5 minutes.
+Either way, you'll end up with:
+- `config.yaml` — your personal settings
+- `notifications/.env` — your Telegram bot credentials
+- `resell_inventory.xlsx` — your inventory spreadsheet
+- A verified Telegram connection
 
 ---
 

@@ -1,0 +1,35 @@
+# Followup Run — Act on David's Telegram Replies
+
+This is the orchestration doc for the follow-up scheduled run (typically 1 hour after the morning run). It checks for David's Telegram replies and executes any decisions he made.
+
+---
+
+## Step 1 — Find the workspace
+
+```bash
+find /sessions -name "resell_inventory.xlsx" 2>/dev/null | head -1 | xargs dirname
+```
+
+Store the result as WORKSPACE.
+
+---
+
+## Step 2 — Fix Chrome if needed
+
+If Chrome tools are timing out, follow the "Fixing Chrome timeouts" instructions in `[WORKSPACE]/CLAUDE.md`.
+
+---
+
+## Step 3 — Run the followup skill
+
+Read and follow `[WORKSPACE]/skills/followup/SKILL.md`.
+
+This skill handles everything:
+- Fetching David's Telegram replies via Chrome JS
+- Reading `pending_actions.json` to match replies to actions
+- Sending buyer replies in the browser
+- Resolving handled actions
+- Updating inventory
+- Sending Telegram confirmation
+
+If David hasn't replied yet, the skill exits cleanly with no message sent.

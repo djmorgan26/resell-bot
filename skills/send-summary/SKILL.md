@@ -164,12 +164,12 @@ Geometric Recliner      | FB Mkt   |   $150 |  $110 | —
 IMPORTANT:
 [urgent items, or "No urgent items."]
 
-─────────────────────────────────────────
+─────────────────────────────────────
 Active Listings — [DATE]
-─────────────────────────────────────────
+─────────────────────────────────────
 Item                    | Platform | Listed | Floor | Notes
 [row per active listing]
-─────────────────────────────────────────
+─────────────────────────────────────
 ```
 
 Keep the total message under ~4000 characters (Telegram's limit). If it would exceed that, truncate the Notes column first.

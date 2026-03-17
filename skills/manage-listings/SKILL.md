@@ -121,14 +121,14 @@ If a listing has been active for more than 7 days with low views/watchers:
 
 All notifications go via Telegram. Gmail MCP is read-only and cannot send messages.
 
-Every run ends with a Telegram summary — follow `[WORKSPACE]/notifications/SKILL.md` for the exact format. That skill defines:
+Every run ends with a Telegram summary — follow `[WORKSPACE]/skills/send-summary/SKILL.md` for the exact format. That skill defines:
 - The **IMPORTANT** section: urgent items with **numbered reply options** so David can respond from his phone
 - The **Active Listings table**: current state of all listed items
 - How to write **pending_actions.json** (required after every run — consumed by the follow-up task)
 
 The Telegram message is always sent at the end of every run, regardless of whether anything urgent happened.
 
-**New behavior:** IMPORTANT items must include numbered reply options (e.g. "Carter 1", "Carter 2"). David replies in Telegram from his phone; the follow-up run picks up his reply and executes the action. See `notifications/SKILL.md` for the exact format.
+**New behavior:** IMPORTANT items must include numbered reply options (e.g. "Carter 1", "Carter 2"). David replies in Telegram from his phone; the follow-up run picks up his reply and executes the action. See `skills/send-summary/SKILL.md` for the exact format.
 
 ## Inventory Tracker Updates
 
@@ -139,9 +139,9 @@ After every check, update the inventory spreadsheet at `[workspace]/resell_inven
 - Add notes about offers, messages, or engagement levels
 - Update the "last checked" date
 
-Use the update_inventory.py script from the resell skill:
+Use the update_inventory.py script:
 ```bash
-python3 <resell-skill-path>/scripts/update_inventory.py <xlsx_path> update --name "Item Name" --status sold --sold-price 425
+python3 [WORKSPACE]/scripts/update_inventory.py <xlsx_path> update --name "Item Name" --status sold --sold-price 425
 ```
 
 ## Reading the Inventory
@@ -170,8 +170,8 @@ When running as a scheduled task (cron), the workflow is:
 3. Handle routine interactions (answer simple questions, respond to "still available?")
 4. Flag urgent items (sales, offers, unanswerable questions) for the Telegram IMPORTANT section
 5. Update the inventory tracker
-6. Send Telegram summary — read and follow `[WORKSPACE]/notifications/SKILL.md`
-7. Write `pending_actions.json` — follow `[WORKSPACE]/notifications/SKILL.md` for the exact format (required even if empty)
+6. Send Telegram summary — read and follow `[WORKSPACE]/skills/send-summary/SKILL.md`
+7. Write `pending_actions.json` — follow `[WORKSPACE]/skills/send-summary/SKILL.md` for the exact format (required even if empty)
 8. Exit cleanly
 
 The whole check should complete in a few minutes. If a marketplace is unreachable, note it and move on — don't retry indefinitely.

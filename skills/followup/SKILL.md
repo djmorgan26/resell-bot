@@ -189,7 +189,7 @@ EOF
 For each item in MATCHED where a real reply was sent (not `__HOLD__`), update `resell_inventory.xlsx` with a note:
 
 ```bash
-python3 [WORKSPACE]/resell-skill/scripts/update_inventory.py [WORKSPACE]/resell_inventory.xlsx \
+python3 [WORKSPACE]/scripts/update_inventory.py [WORKSPACE]/resell_inventory.xlsx \
   update --name "Item Name" \
   --notes "Reply sent to [buyer] [date]: '[first 60 chars of reply]...'"
 ```
@@ -200,7 +200,7 @@ Use today's date in the note. This keeps the inventory in sync with what was act
 
 ## Step 8 — Send Telegram Confirmation
 
-Navigate Chrome to `https://example.com`, then send a confirmation message following the instructions in `[WORKSPACE]/notifications/SKILL.md` (Chrome JS fetch method — the same one used for outbound messages in the morning run).
+Navigate Chrome to `https://example.com`, then send a confirmation message following the instructions in `[WORKSPACE]/skills/send-summary/SKILL.md` (Chrome JS fetch method — the same one used for outbound messages in the morning run).
 
 Build the message like this:
 

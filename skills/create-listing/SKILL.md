@@ -23,7 +23,7 @@ The workflow has 6 stages. You can start at any stage depending on what the user
 If photos are HEIC format, convert them to JPEG first:
 
 ```bash
-python3 /path/to/resell-skill/scripts/convert_heic.py <input_dir> <output_dir>
+python3 [WORKSPACE]/scripts/convert_heic.py <input_dir> <output_dir>
 ```
 
 The script converts all .heic files to .jpeg while preserving quality. The output directory will contain web-ready images.
@@ -179,7 +179,7 @@ Track all items in an inventory spreadsheet. After generating a listing, update 
 
 The inventory tracker lives at: `[workspace]/resell_inventory.xlsx`
 
-Use the `resell-skill/scripts/update_inventory.py` script to add/update entries programmatically.
+Use the `scripts/update_inventory.py` script to add/update entries programmatically.
 
 ## Batch Processing
 

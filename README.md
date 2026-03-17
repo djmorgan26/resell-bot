@@ -1,6 +1,8 @@
 # resell-bot
 
-Automated daily monitoring of eBay and Facebook Marketplace listings using Claude (Cowork). Checks for messages, offers, and sales — auto-responds to routine questions, emails you when something important happens, and sends a Telegram summary after every run.
+An automated reselling assistant that runs on a daily schedule. It monitors your eBay and Facebook Marketplace listings, handles routine buyer questions automatically, and sends you a Telegram notification when something important needs your attention — a sale, a real offer, or a question it can't answer.
+
+You never accept offers, finalize sales, or make commitments from your phone. The bot handles the busywork; you handle the decisions.
 
 ---
 
@@ -8,14 +10,13 @@ Automated daily monitoring of eBay and Facebook Marketplace listings using Claud
 
 Every morning, Claude:
 
-- Checks all active eBay and Facebook Marketplace listings
+- Checks all your active eBay and Facebook Marketplace listings
 - Replies automatically to "is this available?" and basic buyer questions
-- Sends you a Telegram notification if something sold, an offer came in, or a buyer asked something it can't answer
+- Sends a Telegram notification for anything that needs your attention (sale, offer, complex question)
 - Updates `resell_inventory.xlsx` with any changes
-- Sends a Telegram message summarizing urgent items and a table of all active listings
-- Stays quiet via email if nothing happened (no spam)
+- Sends a Telegram summary of all active listings and any urgent items
 
-It never accepts offers, finalizes sales, or makes commitments without you.
+You can also send photos of new items to the Telegram bot from your phone — the bot will research pricing, write the description, and create the listing for you.
 
 ---
 
@@ -23,41 +24,48 @@ It never accepts offers, finalizes sales, or makes commitments without you.
 
 ```
 resell-bot/
-├── CLAUDE.md                     # Project instructions loaded automatically by Claude
-├── manage-listings-skill/
-│   └── SKILL.md                  # Daily monitoring: check listings, respond to buyers, email alerts
-├── resell-skill/
-│   ├── SKILL.md                  # Creating new listings: research, pricing, photos, posting
-│   └── scripts/
-│       ├── update_inventory.py   # CLI tool for managing the inventory spreadsheet
-│       └── convert_heic.py       # Converts iPhone HEIC photos to JPEG for listings
-├── notifications/
-│   ├── SKILL.md                  # Telegram summary skill — format and send end-of-run message
-│   ├── notifier.py               # Main interface: notify(message) sends via Telegram
-│   ├── telegram.py               # Raw Telegram Bot API call
-│   ├── .env                      # Azure SP credentials (gitignored — copy manually)
-│   └── .env.example              # Template showing required keys
-├── resell_inventory.xlsx         # Your live inventory tracker (source of truth)
-├── requirements.txt              # Python dependencies
-├── scheduled-task-prompt.txt     # The prompt used by the Cowork scheduled task
-└── README.md
+├── CLAUDE.md                          # Project instructions loaded automatically by Claude
+├── config.yaml                        # Your settings (gitignored — created by setup.py)
+├── config.example.yaml                # Template showing what config.yaml should contain
+├── setup.py                           # Interactive setup wizard — run this first
+├── resell_inventory.xlsx              # Your live inventory (gitignored — created by setup.py)
+├── resell_inventory_template.xlsx     # Blank inventory template
+├── requirements.txt                   # Python dependencies
+├── skills/                            # Skill docs — Claude reads and follows these
+│   ├── setup/SKILL.md                 # AI-guided first-time setup
+│   ├── photo-inbox/SKILL.md           # Check Telegram for photos you sent
+│   ├── manage-listings/SKILL.md       # Daily listing monitoring
+│   ├── create-listing/SKILL.md        # Create a new listing from photos
+│   ├── followup/SKILL.md              # Act on your Telegram replies
+│   ├── send-summary/SKILL.md          # Format and send the Telegram summary
+│   └── scheduled-runs/
+│       ├── morning-run.md             # Daily run orchestration
+│       └── followup-run.md            # Follow-up run orchestration
+├── scripts/
+│   ├── update_inventory.py            # CLI tool for the inventory spreadsheet
+│   └── convert_heic.py               # Convert iPhone HEIC photos to JPEG
+├── notifications/                     # Telegram API modules
+│   ├── .env                           # Your credentials (gitignored)
+│   ├── .env.example                   # Template
+│   └── ...
+└── schedule-prompts/                  # Prompts for Cowork scheduled tasks
+    ├── morning.txt
+    └── followup.txt
 ```
 
 ---
 
-## Setup on a new machine
+## Getting started
 
 ### What you need
 
 | Requirement | Notes |
 |---|---|
 | **Git** | Clone and sync the repo |
-| **Python 3** | Run inventory scripts; `.venv` built from `requirements.txt` |
-| **Claude Cowork** | Runs the scheduled task |
-| **Chrome** | Must be logged into eBay and Facebook — Cowork uses it for marketplace checks |
-| **`notifications/.env`** | Gitignored — must be copied manually from another machine |
-
-**Not required:** Azure CLI, Telegram app (receiving only), any other CLI tools.
+| **Python 3.8+** | Run scripts and the setup wizard |
+| **Claude (Cowork)** | Runs the scheduled tasks |
+| **Chrome** | Must be logged into eBay and Facebook — Claude uses it for marketplace checks |
+| **Telegram** | Where you receive notifications and send replies |
 
 ---
 
@@ -70,7 +78,7 @@ cd resell-bot
 
 ---
 
-### Step 2 — Set up the Python environment
+### Step 2 — Install Python dependencies
 
 ```bash
 python3 -m venv .venv
@@ -78,169 +86,113 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Activate the venv (`source .venv/bin/activate`) whenever you run scripts manually.
-
 ---
 
-### Step 3 — Copy the Telegram credentials
-
-The `.env` file is gitignored and must be copied manually between machines:
+### Step 3 — Run the setup wizard
 
 ```bash
-cp /path/to/old-machine/notifications/.env notifications/.env
+python3 setup.py
 ```
 
-See `notifications/.env.example` for the required keys. This file holds the Azure Service Principal credentials used to fetch the Telegram bot token and chat ID from Key Vault.
+The wizard will ask you a few questions and walk you through:
+- Creating your `config.yaml` (name, eBay username, selling preferences)
+- Creating a Telegram bot and getting your credentials
+- Writing `notifications/.env`
+- Setting up your inventory spreadsheet
+- Sending a test notification to verify everything works
+
+Takes about 5 minutes.
 
 ---
 
 ### Step 4 — Log in to Chrome
 
 Open Chrome and make sure you're logged into:
-- **eBay** — seller account `davimorga-30`
+- **eBay** — your seller account
 - **Facebook** — the account linked to your Marketplace listings
 
-The scheduled task uses Chrome directly — if you're logged out when it runs, the marketplace check will fail.
+Claude uses Chrome directly for marketplace checks. If you're logged out when it runs, the check will fail.
 
 ---
 
-### Step 5 — Open Cowork and select the folder
+### Step 5 — Open Cowork and select this folder
 
 1. Open the Claude desktop app
 2. Start a new Cowork session
 3. When prompted to select a folder, choose the `resell-bot` folder
 4. Cowork will mount it as your workspace
 
----
-
-### Step 6 — Set up the scheduled task
-
-1. Open `scheduled-task-prompt.txt` from your workspace — this is the full prompt for the daily job
-2. In Cowork, open the **Schedule** feature
-3. Use these settings:
-   - **Task name:** `daily-listing-check`
-   - **Schedule:** `0 9 * * *` (every day at 9:00 AM)
-   - **Prompt:** paste the full contents of `scheduled-task-prompt.txt`
-4. Save the task
+For a fully guided setup experience (including scheduling), tell Claude:
+> "Follow the setup skill at `skills/setup/SKILL.md`"
 
 ---
 
-### Step 7 — Confirm Telegram is working
+### Step 6 — Set up the scheduled tasks
 
-Test that the Telegram notifier can reach Key Vault and send a message:
+Two scheduled tasks power the daily automation:
+
+| Task | Schedule | Prompt file |
+|------|----------|-------------|
+| Morning run | Daily at 9:00 AM | `schedule-prompts/morning.txt` |
+| Follow-up run | Daily at 10:00 AM | `schedule-prompts/followup.txt` |
+
+In Cowork, open the **Schedule** feature, create each task, and paste the contents of the prompt file.
+
+---
+
+## Adding a listing manually
 
 ```bash
 source .venv/bin/activate
-python3 -c "
-import sys; sys.path.insert(0, 'notifications')
-from notifications.notifier import notify
-notify('resell-bot test — setup complete')
-"
-```
-
-If it fails, check that `notifications/.env` has valid Azure SP credentials.
-
-**Note:** Gmail MCP is read-only — it cannot send messages. All notifications go through Telegram.
-
----
-
-## Adding or removing listings
-
-The daily check reads directly from `resell_inventory.xlsx` — no hardcoded listing data anywhere. To add a listing:
-
-```bash
-source .venv/bin/activate
-python3 resell-skill/scripts/update_inventory.py resell_inventory.xlsx add \
-  --name "My New Item" \
-  --category "Furniture" \
-  --price-mid 75 \
-  --status listed \
-  --marketplace "FB Marketplace" \
+python3 scripts/update_inventory.py resell_inventory.xlsx add \
+  --name "My Item" --category "Electronics" --price-mid 75 \
+  --status listed --marketplace "FB Marketplace" \
   --listing-url "https://www.facebook.com/marketplace/item/XXXXX"
 ```
 
-Then commit and push:
-
+Then sync:
 ```bash
 git add resell_inventory.xlsx
-git commit -m "add My New Item listing"
+git commit -m "add My Item listing"
 git push
 ```
 
-To mark an item sold:
+## Marking an item sold
 
 ```bash
-python3 resell-skill/scripts/update_inventory.py resell_inventory.xlsx update \
-  --name "My New Item" --status sold --sold-price 65
+python3 scripts/update_inventory.py resell_inventory.xlsx update \
+  --name "My Item" --status sold --sold-price 65
+git add resell_inventory.xlsx && git commit -m "inventory update $(date +%Y-%m-%d)" && git push
 ```
 
 ---
 
-## Creating new listings (resell-skill)
+## Creating new listings (photos → published)
 
-The `resell-skill/SKILL.md` is for when you want Claude to help create a new listing from scratch — researching comps, pricing, writing descriptions, organizing photos, and posting. Use it in a regular Cowork session (not the scheduled task):
+Send photos of items to your Telegram bot from your phone with a caption (the item name). On the next morning run, Claude will check for new photos, research pricing, write a description, and create the listing.
 
-> "Use the resell skill at `resell-skill/SKILL.md` to help me list this item."
-
-The `convert_heic.py` script converts iPhone photos to JPEG before uploading:
-
-```bash
-python3 resell-skill/scripts/convert_heic.py /path/to/photos/
-```
-
----
-
-## Keeping inventory in sync
-
-`resell_inventory.xlsx` is the source of truth. After Claude updates it during a daily check, commit and push:
-
-```bash
-git add resell_inventory.xlsx
-git commit -m "inventory update $(date +%Y-%m-%d)"
-git push
-```
-
-Pull before running on a new machine:
-
-```bash
-git pull
-```
-
----
-
-## Notifications
-
-All notifications go via **Telegram**. Gmail MCP is connected as read-only only — it cannot send messages.
-
-After every run you'll get a Telegram message with:
-- **IMPORTANT** — urgent items needing your action (sales, offers, unanswerable buyer questions)
-- **Active Listings table** — all current listings with platform, listed price, floor price, and any notes
-
-The format is defined in `notifications/SKILL.md`.
+Or start it manually in Cowork:
+> "Follow the create-listing skill at `skills/create-listing/SKILL.md`"
 
 ---
 
 ## Troubleshooting
 
-**Claude can't find the inventory file**
-Make sure you selected the `resell-bot` folder (not a parent folder) as your Cowork workspace.
+**"Looks like setup isn't complete yet"**
+Run `python3 setup.py` — it will walk you through what's missing.
 
 **No Telegram messages arriving**
-Check that `notifications/.env` exists with valid Azure SP credentials and run the test command from Step 7.
-
-**eBay or Facebook shows as logged out**
-Make sure you're logged into both in Chrome before the scheduled run.
-
-**No Telegram message**
-Check that `notifications/.env` exists and has valid Azure SP credentials. Test with:
+Check that `notifications/.env` exists with valid credentials. Test with:
 ```bash
 source .venv/bin/activate
-python3 -c "
-import sys; sys.path.insert(0, 'notifications')
-from notifications.notifier import notify
-notify('test message')
-"
+python3 -c "from notifications.notifier import notify; notify('test')"
 ```
 
-**Inventory is out of date**
-Pull the latest before running: `git pull`
+**eBay or Facebook shows as logged out**
+Log in to both in Chrome before the scheduled run.
+
+**Chrome times out**
+Follow the Chrome timeout fix in `CLAUDE.md` — it's a two-step reconnect procedure.
+
+**Inventory is out of date on a second machine**
+Run `git pull` before starting any session.

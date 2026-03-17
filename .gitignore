@@ -5,3 +5,7 @@ __pycache__/
 .env
 *.log
 .venv/
+
+# Personal data — gitignored so others get a clean slate on clone
+resell_inventory.xlsx
+config.yaml

@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-photo_inbox.py — polls Telegram for photos sent by David and downloads them.
+photo_inbox.py — polls Telegram for photos sent by the user and downloads them.
 
-David sends photos to the Telegram bot from his iPhone with a caption describing
+The user sends photos to the Telegram bot from their phone with a caption describing
 the item (e.g. "Kitchen mixer" or "Vintage lamp"). This module finds those photo
 messages, downloads the highest-resolution version, and saves them into per-item
 folders under photo-inbox/.

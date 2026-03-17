@@ -33,6 +33,14 @@ _chat_id: str | None = None
 def _load_secrets() -> None:
     """Read Telegram credentials from .env file."""
     global _token, _chat_id
+
+    if not _env_path.exists():
+        raise RuntimeError(
+            "notifications/.env not found. "
+            "Run `python3 setup.py` to complete setup, "
+            "or copy notifications/.env.example to notifications/.env and fill in your credentials."
+        )
+
     _token = os.getenv("TELEGRAM_BOT_TOKEN")
     _chat_id = os.getenv("TELEGRAM_CHAT_ID")
     if not _token or not _chat_id:

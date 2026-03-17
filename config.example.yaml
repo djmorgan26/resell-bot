@@ -1,0 +1,21 @@
+# resell-bot configuration
+# ---
+# Copy this file to config.yaml and fill in your values.
+# config.yaml is gitignored — never commit it.
+# Run `python3 setup.py` to be guided through this automatically.
+
+user:
+  # Your first name — used in notifications and skill docs
+  name: ""
+
+selling:
+  # Your eBay seller username (shown in "My eBay > Account")
+  ebay_username: ""
+
+  # Pricing priority: "speed" = quick sale, "price" = maximize profit
+  priority: "speed"
+
+marketplaces:
+  # Which platforms you sell on. Remove any you don't use.
+  - "ebay"
+  - "fb_marketplace"

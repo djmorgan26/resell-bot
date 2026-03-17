@@ -1,11 +1,11 @@
 ---
 name: photo-inbox
-description: "Check Telegram for photos David sent from his phone and download them into photo-inbox/. Run this at the start of any session or scheduled task to see if David has new items to sell. If new photos are found, hand off to skills/create-listing/SKILL.md to create listings."
+description: "Check Telegram for photos the user sent from their phone and download them into photo-inbox/. Run this at the start of any session or scheduled task to see if there are new items to sell. If new photos are found, hand off to skills/create-listing/SKILL.md to create listings."
 ---
 
 # Photo Inbox — Telegram Photo Retrieval
 
-David sends photos of items he wants to sell directly to the Telegram bot from his iPhone. Each message has one or more photos and a caption naming the item (e.g. "Kitchen mixer" or "Vintage lamp").
+The user sends photos of items they want to sell directly to the Telegram bot from their phone. Each message has one or more photos and a caption naming the item (e.g. "Kitchen mixer" or "Vintage lamp").
 
 This skill checks for new photo messages, downloads them, and organizes them into `photo-inbox/<item-name>/` folders ready for the resell skill.
 
@@ -14,7 +14,7 @@ This skill checks for new photo messages, downloads them, and organizes them int
 ## When to Run
 
 - **Start of every scheduled task** — check for new items before monitoring existing listings
-- **When David says he sent photos** — run on demand
+- **When the user says they sent photos** — run on demand
 - **After any Telegram notification** that mentions new photos
 
 ---
@@ -193,16 +193,16 @@ Once photos are saved, for each new item folder in `photo-inbox/`:
 
 ---
 
-## What David Does on His Phone
+## What to Do on Your Phone
 
-David's workflow is just:
+Your workflow is just:
 
 1. Take photos of the item
 2. Open Telegram → the resell bot chat
 3. Send photos with a caption like "Vintage desk lamp" or "KitchenAid mixer"
 4. Done — Claude handles the rest on the next run
 
-**Tips for David:**
+**Tips:**
 - Send multiple photos as an album (select multiple in Telegram) — they'll be grouped automatically
 - Put the item name in the caption of the FIRST photo — the rest can be blank
 - Include detail shots, labels, any flaws

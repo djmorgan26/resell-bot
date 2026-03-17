@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-reply_handler.py — parses David's Telegram replies and matches them to pending actions.
+reply_handler.py — parses the user's Telegram replies and matches them to pending actions.
 
-David replies in the format:
+The user replies in the format:
     "Key N"  or  "Key: N"
     e.g.  "Carter 1"  → execute option 1 for the "Carter" pending action
           "Carter 2"  → execute option 2
@@ -57,7 +57,7 @@ def has_pending() -> bool:
 
 def match_replies(messages: list[dict]) -> list[dict]:
     """
-    Match David's Telegram messages against pending actions.
+    Match the user's Telegram messages against pending actions.
 
     Accepts these reply formats (case-insensitive):
         "Carter 1"

@@ -2,7 +2,7 @@
 """
 telegram_reader.py — reads incoming messages sent to the Telegram bot.
 
-Returns messages sent by David (non-bot) within the last N hours.
+Returns messages sent by the user (non-bot) within the last N hours.
 
 IMPORTANT — Cowork sandbox vs. local use:
   In the Cowork VM, Python cannot reach api.telegram.org (sandbox proxy blocks it).
@@ -105,7 +105,7 @@ def parse_updates_response(
 
 def get_recent_messages(hours: float = 2.0) -> list[dict]:
     """
-    Return messages sent to the bot by David in the last `hours` hours.
+    Return messages sent to the bot by the user in the last `hours` hours.
 
     NOTE: This will fail in the Cowork sandbox VM (Python can't reach api.telegram.org).
     Use parse_updates_response() with a Chrome JS fetch instead for scheduled runs.

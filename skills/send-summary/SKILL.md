@@ -1,13 +1,13 @@
 ---
 name: send-listing-summary
-description: "Send a formatted Telegram summary after a manage-listings run. Call this as the final step of every scheduled listing check. Formats all findings into a clean two-section message: an IMPORTANT block at the top (urgent items needing David's action with numbered reply options) and a table of all active listings at the bottom. Also writes pending_actions.json for the follow-up run to consume."
+description: "Send a formatted Telegram summary after a manage-listings run. Call this as the final step of every scheduled listing check. Formats all findings into a clean two-section message: an IMPORTANT block at the top (urgent items needing the user's action with numbered reply options) and a table of all active listings at the bottom. Also writes pending_actions.json for the follow-up run to consume."
 ---
 
 # Send Listing Summary via Telegram
 
 Call this skill as the **last step** of every manage-listings run. It sends one consolidated Telegram message summarizing everything that happened and the current state of all active listings.
 
-David can reply directly in Telegram (e.g. "Carter 1") to trigger actions in the follow-up run. Always format IMPORTANT items with numbered options so David can respond from his phone.
+The user can reply directly in Telegram (e.g. "Carter 1") to trigger actions in the follow-up run. Always format IMPORTANT items with numbered options so they can respond from their phone.
 
 ---
 
@@ -67,7 +67,7 @@ Build the message as two sections, separated by a divider.
 
 ### Section 1 — IMPORTANT
 
-This section is only included if there are **urgent items requiring David's attention**. If nothing is urgent, omit it entirely and start directly with the listings table.
+This section is only included if there are **urgent items requiring the user's attention**. If nothing is urgent, omit it entirely and start directly with the listings table.
 
 Urgent items include:
 - A sale that completed (needs shipping)

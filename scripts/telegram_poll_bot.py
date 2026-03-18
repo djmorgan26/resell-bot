@@ -6,12 +6,15 @@ Runs as a background service (launchd). Polls Telegram via long polling.
 When the user sends photos, it asks for confirmation, then spawns a `claude` CLI
 session to research, price, and document the item in the inventory spreadsheet.
 
+Supports BATCH MODE: send photos for multiple items (each with a distinct caption),
+then say "go" once to research all of them in parallel.
+
 Flow:
-  1. User sends photo(s) with caption to the Telegram bot
-  2. Bot replies: "I see [caption]! Send more photos/details, or reply 'go'."
-  3. User replies 'go' (or 'yes', 'list', etc.)
-  4. Bot downloads photos to photo-inbox/<item>/
-  5. Bot spawns: claude -p "research and document this item..."
+  1. User sends photo(s) with captions to the Telegram bot (one caption per item)
+  2. Bot groups photos by caption — each distinct caption = one item
+  3. Bot replies with a summary of all queued items
+  4. User replies 'go' (or 'yes', 'list', etc.)
+  5. Bot downloads photos and spawns a Claude session for EACH item in parallel
   6. Claude researches comps, prices it, writes listing draft, updates inventory
   7. Claude sends Telegram summary with item details and next steps
 
@@ -58,6 +61,8 @@ INBOX_DIR = REPO_ROOT / "photo-inbox"
 POLL_INTERVAL = 3  # seconds between polls
 SESSION_TIMEOUT = 1800  # 30 min — expire pending sessions
 OFFSET_FILE = REPO_ROOT / "photo-inbox" / ".listener_offset"
+CONSUMED_UPDATES_FILE = REPO_ROOT / "notifications" / "consumed_updates.json"
+CONSUMED_UPDATES_TTL = 86400  # 24 hours — prune older updates
 
 logging.basicConfig(
     level=logging.INFO,
@@ -134,8 +139,50 @@ def save_offset(offset: int) -> None:
     OFFSET_FILE.write_text(str(offset))
 
 
+# ─── Consumed updates persistence ──────────────────────────────────────────
+# Every update the poll bot receives is saved here so that OTHER systems
+# (followup skill, telegram_reader) can read messages the bot consumed.
+# Format mirrors Telegram's getUpdates response: {"ok": true, "result": [...]}
+
+def _load_consumed_updates() -> list[dict]:
+    """Load previously consumed updates from disk."""
+    if CONSUMED_UPDATES_FILE.exists():
+        try:
+            data = json.loads(CONSUMED_UPDATES_FILE.read_text())
+            return data.get("result", [])
+        except (json.JSONDecodeError, OSError):
+            pass
+    return []
+
+
+def _save_consumed_updates(updates: list[dict]) -> None:
+    """Save consumed updates, pruning anything older than TTL."""
+    now = time.time()
+    pruned = []
+    for u in updates:
+        msg = u.get("message") or u.get("channel_post") or {}
+        msg_date = msg.get("date", 0)
+        if now - msg_date < CONSUMED_UPDATES_TTL:
+            pruned.append(u)
+
+    CONSUMED_UPDATES_FILE.parent.mkdir(parents=True, exist_ok=True)
+    CONSUMED_UPDATES_FILE.write_text(json.dumps({"ok": True, "result": pruned}, indent=2))
+
+
+def append_consumed_updates(new_updates: list[dict]) -> None:
+    """Append new updates to the consumed file (deduplicating by update_id)."""
+    existing = _load_consumed_updates()
+    seen_ids = {u.get("update_id") for u in existing}
+    for u in new_updates:
+        if u.get("update_id") not in seen_ids:
+            existing.append(u)
+            seen_ids.add(u.get("update_id"))
+    _save_consumed_updates(existing)
+
+
 # ─── Pending session tracking ───────────────────────────────────────────────
-# A "session" accumulates photos + context until the user says "go".
+# Sessions accumulate photos + context until the user says "go".
+# Multiple sessions can be pending at once (batch mode).
 
 class PendingSession:
     """Tracks photos and context for an item before the user confirms."""
@@ -146,6 +193,7 @@ class PendingSession:
         self.extra_context: list[str] = []
         self.first_message_id = first_message_id
         self.last_activity = time.time()
+        self.prompted = False  # whether we've sent the album acknowledgment
 
     @property
     def folder_name(self) -> str:
@@ -171,23 +219,45 @@ class PendingSession:
     def summary(self) -> str:
         parts = [f'"{self.caption}"']
         parts.append(f"{len(self.photos)} photo(s)")
-        if self.extra_context:
-            parts.append(f"{len(self.extra_context)} extra note(s)")
+        real_ctx = [c for c in self.extra_context if c != "__prompted__"]
+        if real_ctx:
+            parts.append(f"{len(real_ctx)} note(s)")
         return ", ".join(parts)
 
 
-# Active sessions: one per chat (simple — user lists one item at a time)
-_pending: PendingSession | None = None
+# Batch mode: multiple pending sessions, keyed by folder_name
+_pending_sessions: Dict[str, PendingSession] = {}
+# Map media_group_id → session folder_name so album photos route correctly
+_media_group_map: Dict[str, str] = {}
+# Track the most recently created session key (for captionless non-album photos)
+_last_session_key: Optional[str] = None
 
 # Trigger words that mean "go ahead and research it"
 GO_WORDS = {"go", "yes", "list", "list it", "do it", "start", "sell", "sell it", "post", "post it"}
+# Words that cancel everything
+CANCEL_WORDS = {"cancel", "stop", "nevermind", "nvm", "no", "cancel all"}
 
 
 # ─── Core logic ──────────────────────────────────────────────────────────────
 
+def _queue_summary() -> str:
+    """Build a summary of all pending sessions."""
+    if not _pending_sessions:
+        return "No items queued."
+    lines = []
+    for i, session in enumerate(_pending_sessions.values(), 1):
+        lines.append(f"  {i}. {session.summary}")
+    return "\n".join(lines)
+
+
+def _find_session_for_media_group(media_group_id: str) -> Optional[str]:
+    """Find which session a media_group_id belongs to."""
+    return _media_group_map.get(media_group_id)
+
+
 def handle_update(update: dict) -> None:
     """Process a single Telegram update."""
-    global _pending
+    global _last_session_key
 
     msg = update.get("message")
     if not msg:
@@ -207,11 +277,13 @@ def handle_update(update: dict) -> None:
     text = (msg.get("text") or "").strip()
     caption = (msg.get("caption") or "").strip()
     has_photo = "photo" in msg
+    media_group_id = msg.get("media_group_id")
 
-    # Expire stale session
-    if _pending and _pending.is_expired:
-        log.info(f"Session expired for '{_pending.caption}'")
-        _pending = None
+    # Expire stale sessions
+    expired = [k for k, s in _pending_sessions.items() if s.is_expired]
+    for k in expired:
+        log.info(f"Session expired for '{_pending_sessions[k].caption}'")
+        del _pending_sessions[k]
 
     if has_photo:
         # Pick highest resolution
@@ -221,91 +293,156 @@ def handle_update(update: dict) -> None:
             "file_unique_id": best["file_unique_id"],
             "width": best.get("width"),
             "height": best.get("height"),
-            "media_group_id": msg.get("media_group_id"),
+            "media_group_id": media_group_id,
         }
 
-        if _pending is None:
-            # Start a new session
-            item_name = caption or f"item-{datetime.now().strftime('%Y%m%d-%H%M')}"
-            _pending = PendingSession(item_name, message_id)
-            _pending.add_photo(photo_info)
-            log.info(f"New session started: '{item_name}' (1 photo)")
+        # Determine which session this photo belongs to
+        target_key = None
 
-            # Don't reply to album photos individually — wait a beat
-            # (Telegram sends album photos as separate updates with same media_group_id)
-            # We'll send the prompt after a brief collection window
-            if not msg.get("media_group_id"):
-                send_reply(
-                    f"I see an item: \"{item_name}\"\n\n"
-                    f"Send more photos or details if you have them.\n"
-                    f"When you're ready, reply \"go\" and I'll research it.",
-                    reply_to=message_id,
-                )
-        else:
-            # Add to existing session
-            _pending.add_photo(photo_info)
-            # Update caption if this photo has one and the session doesn't have a good one
-            if caption and _pending.caption.startswith("item-"):
-                _pending.caption = caption
-            log.info(f"Photo added to session '{_pending.caption}' ({len(_pending.photos)} total)")
+        if media_group_id:
+            # Check if this media group already maps to a session
+            target_key = _find_session_for_media_group(media_group_id)
+
+        if target_key is None and caption:
+            # New caption = new item. Create a session for it.
+            item_name = caption
+            session = PendingSession(item_name, message_id)
+            target_key = session.folder_name
+            _pending_sessions[target_key] = session
+            if media_group_id:
+                _media_group_map[media_group_id] = target_key
+            _last_session_key = target_key
+            log.info(f"New session started: '{item_name}'")
+
+        elif target_key is None and not caption:
+            if media_group_id and _last_session_key and _last_session_key in _pending_sessions:
+                # Captionless album photo — route to most recent session
+                target_key = _last_session_key
+                _media_group_map[media_group_id] = target_key
+            elif _last_session_key and _last_session_key in _pending_sessions:
+                # Captionless non-album photo — add to most recent session
+                target_key = _last_session_key
+            else:
+                # No session at all — create an unnamed one
+                item_name = f"item-{datetime.now().strftime('%Y%m%d-%H%M')}"
+                session = PendingSession(item_name, message_id)
+                target_key = session.folder_name
+                _pending_sessions[target_key] = session
+                _last_session_key = target_key
+                log.info(f"New unnamed session started: '{item_name}'")
+
+        # Add the photo to the target session
+        if target_key and target_key in _pending_sessions:
+            _pending_sessions[target_key].add_photo(photo_info)
+            s = _pending_sessions[target_key]
+            log.info(f"Photo added to '{s.caption}' ({len(s.photos)} total)")
 
     elif text:
         text_lower = text.lower().strip()
 
-        if _pending and text_lower in GO_WORDS:
-            # User confirmed — trigger research
-            log.info(f"User confirmed research for '{_pending.caption}' — triggering workflow")
-            send_reply(
-                f"On it! Researching \"{_pending.caption}\" "
-                f"({len(_pending.photos)} photos).\n\n"
-                f"I'll look up comps, price it, and write a listing draft. "
-                f"You'll get updates along the way.",
-                reply_to=message_id,
+        if _pending_sessions and text_lower in GO_WORDS:
+            # User confirmed — trigger research for ALL pending sessions
+            count = len(_pending_sessions)
+            total_photos = sum(len(s.photos) for s in _pending_sessions.values())
+            log.info(f"User confirmed research for {count} item(s) — triggering workflows")
+
+            items_list = "\n".join(
+                f"  • \"{s.caption}\" ({len(s.photos)} photos)"
+                for s in _pending_sessions.values()
             )
-            trigger_research(_pending)
-            _pending = None
-
-        elif _pending and text_lower in {"cancel", "stop", "nevermind", "nvm", "no"}:
-            log.info(f"User cancelled session for '{_pending.caption}'")
-            send_reply("Got it, cancelled.", reply_to=message_id)
-            _pending = None
-
-        elif _pending:
-            # Treat as extra context
-            _pending.add_context(text)
-            log.info(f"Added context to session '{_pending.caption}': {text[:50]}")
             send_reply(
-                f"Noted. Reply \"go\" when you're ready, or keep adding details.",
+                f"On it! Researching {count} item(s) ({total_photos} photos total):\n\n"
+                f"{items_list}\n\n"
+                f"I'll research each one in parallel. You'll get updates as they finish.",
                 reply_to=message_id,
             )
 
-        # If no pending session and it's just text, ignore
+            trigger_batch_research(list(_pending_sessions.values()))
+
+            _pending_sessions.clear()
+            _media_group_map.clear()
+            _last_session_key = None
+
+        elif _pending_sessions and text_lower in CANCEL_WORDS:
+            count = len(_pending_sessions)
+            log.info(f"User cancelled {count} pending session(s)")
+            send_reply(f"Got it, cancelled {count} item(s).", reply_to=message_id)
+            _pending_sessions.clear()
+            _media_group_map.clear()
+            _last_session_key = None
+
+        elif _pending_sessions:
+            # Check if this looks like context for pending photos or a general instruction.
+            # If the user is replying to one of the bot's queue messages, treat as photo context.
+            # Otherwise, just acknowledge it — it's saved in consumed_updates.json for
+            # the morning run to pick up as a standing instruction.
+            reply_to_msg = msg.get("reply_to_message", {})
+            reply_from = reply_to_msg.get("from", {})
+            is_reply_to_bot = reply_from.get("is_bot", False)
+
+            if is_reply_to_bot:
+                # User is replying to the bot's queue message — treat as photo context
+                if _last_session_key and _last_session_key in _pending_sessions:
+                    _pending_sessions[_last_session_key].add_context(text)
+                    log.info(f"Added context to '{_pending_sessions[_last_session_key].caption}': {text[:50]}")
+                send_reply(
+                    f"Noted. You have {len(_pending_sessions)} item(s) queued:\n\n"
+                    f"{_queue_summary()}\n\n"
+                    f"Keep sending photos, or reply \"go\" to research them all.",
+                    reply_to=message_id,
+                )
+            else:
+                # General message — don't attach to photo sessions.
+                # It's already saved in consumed_updates.json for the morning/followup run.
+                log.info(f"General message (not photo context): {text[:80]}")
+                send_reply(
+                    f"Got it — I'll pass that along to your next scheduled run.\n\n"
+                    f"(You also have {len(_pending_sessions)} item(s) queued for research — "
+                    f"reply \"go\" when ready.)",
+                    reply_to=message_id,
+                )
+
+        else:
+            # No pending sessions — general message.
+            # Saved in consumed_updates.json for the morning/followup run.
+            log.info(f"General message (no sessions): {text[:80]}")
+            send_reply(
+                "Got it — I'll pass that along to your next scheduled run.",
+                reply_to=message_id,
+            )
 
 
 def check_album_prompt() -> None:
-    """After processing a batch of updates, send the album prompt if needed."""
-    global _pending
-    if _pending and len(_pending.photos) > 1 and not _pending.extra_context:
-        # If we got multiple photos (album) and haven't prompted yet,
-        # check if the last photo was part of a media group
-        all_mg = {p.get("media_group_id") for p in _pending.photos}
-        if all_mg != {None}:
-            # This was an album — send a single prompt
-            send_reply(
-                f"I see an item: \"{_pending.caption}\" ({len(_pending.photos)} photos)\n\n"
-                f"Send more photos or details if you have them.\n"
-                f"When you're ready, reply \"go\" and I'll research it.",
-            )
-            # Mark that we've prompted by adding empty context
-            _pending.extra_context.append("__prompted__")
+    """After processing a batch of updates, send a summary of all new/updated sessions."""
+    unprompted = [s for s in _pending_sessions.values() if not s.prompted]
+    if not unprompted:
+        return
+
+    # Mark all as prompted
+    for s in unprompted:
+        s.prompted = True
+
+    total = len(_pending_sessions)
+    if total == 1:
+        s = list(_pending_sessions.values())[0]
+        send_reply(
+            f"I see an item: \"{s.caption}\" ({len(s.photos)} photo(s))\n\n"
+            f"Send more items or details if you have them.\n"
+            f"When you're ready, reply \"go\" and I'll research everything.",
+        )
+    else:
+        send_reply(
+            f"I have {total} item(s) queued:\n\n"
+            f"{_queue_summary()}\n\n"
+            f"Keep sending more items, or reply \"go\" to research them all at once.",
+        )
 
 
-def trigger_research(session: PendingSession) -> None:
-    """Download photos and spawn a Claude session to research and document the item."""
+def _download_session_photos(session: PendingSession) -> Path:
+    """Download all photos for a session and return the folder path."""
     item_folder = INBOX_DIR / session.folder_name
     item_folder.mkdir(parents=True, exist_ok=True)
 
-    # Download all photos
     log.info(f"Downloading {len(session.photos)} photos to {item_folder}")
     for i, photo in enumerate(session.photos, 1):
         try:
@@ -316,43 +453,73 @@ def trigger_research(session: PendingSession) -> None:
         except Exception as e:
             log.error(f"  Failed to download photo {i}: {e}")
 
-    # Build the prompt for Claude
-    context_str = ""
-    real_context = [c for c in session.extra_context if c != "__prompted__"]
-    if real_context:
-        context_str = "\n\nAdditional context from the user:\n" + "\n".join(f"- {c}" for c in real_context)
+    return item_folder
+
+
+def trigger_batch_research(sessions: list[PendingSession]) -> None:
+    """Download photos for all sessions and spawn ONE Claude session to handle them all.
+
+    A single session lets Claude see all items together, so it can:
+    - Recognize that separate photo groups are actually the same item
+    - Group related photos intelligently (e.g. "blue vase front" + "blue vase back")
+    - Process everything with full context
+    """
+    # Download photos for each session
+    items_info = []
+    for session in sessions:
+        folder = _download_session_photos(session)
+        real_context = [c for c in session.extra_context if c != "__prompted__"]
+        context_str = ""
+        if real_context:
+            context_str = "\n    Additional context: " + "; ".join(real_context)
+
+        items_info.append(
+            f"  - Caption: \"{session.caption}\"\n"
+            f"    Photos: {folder} ({len(session.photos)} photo(s))\n"
+            f"    Folder name: {session.folder_name}"
+            f"{context_str}"
+        )
+
+    items_block = "\n\n".join(items_info)
+    count = len(sessions)
 
     prompt = (
         f"Read CLAUDE.md first for project rules and layout.\n\n"
-        f"A new item has arrived for research. The user sent photos via Telegram.\n\n"
-        f"Item name/caption: \"{session.caption}\"\n"
-        f"Photos location: {item_folder}\n"
-        f"Number of photos: {len(session.photos)}\n"
-        f"{context_str}\n\n"
-        f"Read and follow skills/create-listing/SKILL.md for stages 1-5 ONLY.\n"
-        f"Do NOT attempt to publish or use Chrome browser tools.\n\n"
+        f"The user sent {count} item(s) via Telegram for research and listing.\n\n"
+        f"Items received:\n\n{items_block}\n\n"
+        f"IMPORTANT — SMART GROUPING:\n"
+        f"Before processing, look at ALL the photos and captions together. Some may\n"
+        f"actually be the same item sent in separate batches (e.g. different angles,\n"
+        f"or the user sent a few photos then sent more of the same thing later).\n"
+        f"If you determine that multiple caption groups are actually the SAME item,\n"
+        f"merge them — combine their photos into one folder and treat them as one item.\n"
+        f"Use your best judgment based on the photos and captions.\n\n"
+        f"For EACH distinct item (after any merging), follow skills/create-listing/SKILL.md\n"
+        f"stages 1-5 ONLY. Do NOT attempt to publish or use Chrome browser tools.\n\n"
+        f"Process items one at a time, completing all stages for each before moving on.\n\n"
         f"IMPORTANT — Send Telegram progress updates at these milestones using\n"
         f"  from notifications.notifier import notify\n\n"
-        f"  1. After identifying the item (stage 2): tell the user what you think it is\n"
-        f"  2. After pricing (stage 4): send the 3 price tiers and your recommendation\n\n"
+        f"  1. At the start: tell the user how many distinct items you identified\n"
+        f"     (mention any merges you made)\n"
+        f"  2. After pricing each item: send the 3 price tiers and your recommendation\n\n"
         f"PRICING RULE: Default to Market Price for the listed price. The strategy is to\n"
         f"start at market price and lower over time if there's no interest.\n\n"
-        f"After completing stages 1-5:\n"
+        f"After completing stages 1-5 for EACH item:\n"
         f"  1. Update resell_inventory.xlsx with status 'ready' using scripts/update_inventory.py\n"
         f"     Set the listed price to the Market Price tier.\n"
-        f"  2. Move photos from {item_folder} to items/{session.folder_name}/\n"
-        f"  3. Send a final Telegram summary with:\n"
-        f"     - Item identification and key details\n"
-        f"     - The 3 price tiers (quick / market / optimistic)\n"
-        f"     - The listing title and description draft\n"
-        f"     - End with: \"Ready to list! Tell Claude Cowork to publish it, or it will\n"
-        f"       be posted on the next scheduled run.\"\n"
+        f"  2. Move photos from photo-inbox/<folder>/ to items/<folder>/\n"
+        f"  3. After ALL items are done, send ONE final Telegram summary with all items:\n"
+        f"     - Each item's identification, key details, and 3 price tiers\n"
+        f"     - The listing title and description draft for each\n"
+        f"     - End with: \"All {count} item(s) researched and ready! Tell Claude Cowork\n"
+        f"       to publish them, or they'll be posted on the next scheduled run.\"\n"
     )
 
+    label = ", ".join(s.caption for s in sessions)
     _spawn_claude(
         prompt,
-        log_name=f"research-{session.folder_name}",
-        label=session.caption,
+        log_name=f"research-batch-{datetime.now().strftime('%Y%m%d-%H%M%S')}",
+        label=label,
     )
 
 
@@ -400,6 +567,9 @@ def run_once() -> None:
         log.info("No new updates")
         return
 
+    # Save ALL consumed updates so other systems (followup) can read them
+    append_consumed_updates(results)
+
     max_id = offset or 0
     for update in results:
         handle_update(update)
@@ -425,6 +595,9 @@ def run_loop() -> None:
             results = data.get("result", [])
 
             if results:
+                # Save ALL consumed updates so other systems (followup) can read them
+                append_consumed_updates(results)
+
                 max_id = offset or 0
                 for update in results:
                     handle_update(update)

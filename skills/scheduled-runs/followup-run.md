@@ -25,7 +25,8 @@ If Chrome tools are timing out, follow the "Fixing Chrome timeouts" instructions
 Read and follow `[WORKSPACE]/skills/followup/SKILL.md`.
 
 This skill handles everything:
-- Fetching the user's Telegram replies via Chrome JS
+- Reading the user's Telegram replies from `consumed_updates.json` (written by the poll bot)
+- Falling back to Chrome JS if the poll bot isn't running
 - Reading `pending_actions.json` to match replies to actions
 - Sending buyer replies in the browser
 - Resolving handled actions

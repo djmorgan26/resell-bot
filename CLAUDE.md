@@ -53,19 +53,19 @@ resell-bot/
 ├── requirements.txt                   ← Python deps for all scripts
 ├── skills/                            ← all skill docs live here
 │   ├── setup/SKILL.md                 ← AI-guided first-time setup
-│   ├── photo-inbox/SKILL.md           ← Telegram photo retrieval
+│   ├── photo-inbox/SKILL.md           ← Telegram photo retrieval (fallback — poll bot is primary)
 │   ├── manage-listings/SKILL.md       ← daily listing monitoring
 │   ├── create-listing/SKILL.md        ← new listing creation (photos → published)
 │   ├── followup/SKILL.md              ← act on user's Telegram replies
 │   ├── send-summary/SKILL.md          ← format + send Telegram summary
-│   ├── instant-list/SKILL.md          ← real-time Telegram → Claude listing trigger
+│   ├── telegram-bot/SKILL.md           ← single Telegram consumer: routing, batch research
 │   └── scheduled-runs/
 │       ├── morning-run.md             ← orchestration: photo inbox + listing check
 │       └── followup-run.md            ← orchestration: process user's replies
 ├── scripts/
 │   ├── update_inventory.py            ← CLI tool for the spreadsheet
 │   ├── convert_heic.py               ← converts iPhone HEIC photos → JPEG
-│   ├── telegram_poll_bot.py           ← background Telegram watcher (instant research)
+│   ├── telegram_poll_bot.py           ← single Telegram consumer: photos, batch mode, message routing
 │   ├── install-listener.sh           ← installs poll bot as macOS service
 │   └── com.resellbot.telegram-poll-bot.plist ← launchd config
 ├── logs/                              ← listener + Claude session logs (gitignored)
@@ -74,9 +74,10 @@ resell-bot/
 │   ├── .env.example                   ← template
 │   ├── telegram.py                    ← raw Telegram Bot API
 │   ├── telegram_reader.py             ← read incoming text messages
-│   ├── photo_inbox.py                 ← read incoming photo messages
+│   ├── photo_inbox.py                 ← photo message parsing (fallback)
 │   ├── reply_handler.py               ← match user's replies to pending actions
 │   ├── notifier.py                    ← notify(message) — main interface
+│   ├── consumed_updates.json          ← all updates consumed by poll bot (24hr rolling)
 │   └── pending_actions.json           ← written by morning run, consumed by followup
 ├── photo-inbox/                       ← incoming photos from Telegram
 │   └── processed.json                 ← tracks which photos have been downloaded
@@ -98,7 +99,7 @@ resell-bot/
 | `skills/create-listing/SKILL.md` | Create a new listing — photos, pricing research, description, posting | Read and follow the SKILL.md |
 | `skills/followup/SKILL.md` | Act on the user's Telegram replies to pending decisions | Read and follow the SKILL.md |
 | `skills/send-summary/SKILL.md` | Format and send the post-run Telegram summary | Read and follow the SKILL.md |
-| `skills/instant-list/SKILL.md` | Real-time: Telegram photo → research + document in inventory | Runs via `scripts/telegram_poll_bot.py` |
+| `skills/telegram-bot/SKILL.md` | Single Telegram consumer: photo intake, batch research, message routing | Runs via `scripts/telegram_poll_bot.py` |
 
 ### Scheduled runs
 
@@ -109,7 +110,7 @@ The `skills/scheduled-runs/` directory has orchestration docs that chain the ski
 | Morning (daily) | `skills/scheduled-runs/morning-run.md` | `schedule-prompts/morning.txt` |
 | Followup (1hr later) | `skills/scheduled-runs/followup-run.md` | `schedule-prompts/followup.txt` |
 
-If running as a scheduled task, **check the photo inbox first** (photo-inbox skill), then run manage-listings. If new photos are found, hand off each item to create-listing for publishing.
+The poll bot handles real-time photo intake from Telegram. If running as a scheduled task, **check the filesystem** for unprocessed photos in `photo-inbox/` (not Telegram directly), then run manage-listings. If new photos are found, hand off each item to create-listing for publishing.
 
 ---
 
@@ -187,9 +188,10 @@ notifications/
 ├── .env.example      ← template — shows what keys are required
 ├── telegram.py       ← raw Telegram Bot API call
 ├── telegram_reader.py← read incoming text messages
-├── photo_inbox.py    ← read incoming photo messages
+├── photo_inbox.py    ← read incoming photo messages (fallback)
 ├── reply_handler.py  ← match user's replies to pending actions
 ├── notifier.py       ← main interface: loads .env → Telegram
+├── consumed_updates.json ← ALL updates consumed by poll bot (24hr rolling)
 └── pending_actions.json ← written by morning run, consumed by followup
 ```
 
@@ -208,15 +210,15 @@ The `.env` is gitignored. On a new machine, run `python3 setup.py` to create it.
 
 ## Photo inbox — Telegram photo pipeline
 
-The user sends photos of items to sell directly to the Telegram bot from their phone. The photo-inbox skill polls for these and downloads them automatically.
+The poll bot (`scripts/telegram_poll_bot.py`) is the **single consumer** of all Telegram updates. It runs as a background macOS service and handles real-time photo intake, batch queuing, and message routing.
 
-**User's workflow:** Take photos → send to Telegram bot with a caption (item name) → done.
+**User's workflow:** Take photos → send to Telegram bot with a caption → send more items if needed → reply "go" → done.
 
-**Claude's workflow:** Check `skills/photo-inbox/SKILL.md` → download new photos to `photo-inbox/<item-name>/` → hand off to `skills/create-listing/SKILL.md` for listing creation.
+**Poll bot's workflow:** Queue items by caption → download photos to `photo-inbox/<item-name>/` → spawn one Claude session to research all items → update inventory with status "ready".
 
-Photos are tracked in `photo-inbox/processed.json` to avoid re-downloading. After a listing is created, photos move to `items/<item-name>/`.
+The poll bot also saves every consumed update to `notifications/consumed_updates.json` (24-hour rolling window) so that other systems (followup skill, morning run) can read messages the bot already acknowledged.
 
-The Python module at `notifications/photo_inbox.py` handles parsing, grouping (albums), deduplication, and saving. In the Cowork sandbox, all Telegram API calls go through Chrome JS (same pattern as the notification sender).
+After a listing is created, photos move to `items/<item-name>/`. The photo-inbox skill (`skills/photo-inbox/SKILL.md`) is a **fallback** for when the poll bot isn't running. For scheduled runs, just check the filesystem for unprocessed photos.
 
 ---
 

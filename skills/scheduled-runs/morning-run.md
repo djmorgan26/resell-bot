@@ -20,25 +20,53 @@ If Chrome tools are timing out, follow the "Fixing Chrome timeouts" instructions
 
 ---
 
-## Step 3 — Check the photo inbox
+## Step 3 — Check the photo inbox (filesystem only)
 
-Read and follow `[WORKSPACE]/skills/photo-inbox/SKILL.md`.
+The Telegram poll bot (`scripts/telegram_poll_bot.py`) runs as a background service and handles all real-time photo intake from Telegram. It downloads photos to `photo-inbox/<item>/` and triggers Claude research sessions automatically. **Do NOT call Telegram's getUpdates API** — the poll bot is the single consumer of those updates.
 
-This checks Telegram for new photos the user sent from theirphone. If new item photos are found, hand each off to `[WORKSPACE]/skills/create-listing/SKILL.md` to create and publish listings before proceeding to listing monitoring.
+Instead, check the filesystem for any unprocessed photos the poll bot may have downloaded:
 
-If no new photos, continue to Step 4.
+```bash
+ls -d [WORKSPACE]/photo-inbox/*/ 2>/dev/null | grep -v README
+```
+
+If there are item folders with photos that haven't been listed yet (check against `resell_inventory.xlsx`), hand each off to `[WORKSPACE]/skills/create-listing/SKILL.md`.
+
+If no new unprocessed photos, continue to Step 4.
 
 ---
 
 ## Step 4 — Check for instructions from the user
 
-Navigate Chrome to `https://example.com`, then fetch recent Telegram messages (last 24 hours) using the Chrome JS method from `[WORKSPACE]/skills/followup/SKILL.md` (Step 2).
+The poll bot saves all consumed Telegram updates to `notifications/consumed_updates.json`. Read recent user messages from that file:
 
-Read `TELEGRAM_BOT_TOKEN` and `TELEGRAM_CHAT_ID` from `[WORKSPACE]/notifications/.env`.
+```bash
+source [WORKSPACE]/.venv/bin/activate
+python3 - << 'EOF'
+import json, sys, os
+from dotenv import load_dotenv
+sys.path.insert(0, '[WORKSPACE]')
+load_dotenv('[WORKSPACE]/notifications/.env')
+from notifications.telegram_reader import get_consumed_messages
+msgs = get_consumed_messages(hours=24)
+print(json.dumps(msgs, default=str))
+EOF
+```
+
+If `consumed_updates.json` doesn't exist or returns empty, fall back to Chrome JS (the poll bot may not be running):
+
+```javascript
+(async () => {
+  const token = '<TELEGRAM_BOT_TOKEN>';
+  const resp = await fetch(`https://api.telegram.org/bot${token}/getUpdates?limit=100&timeout=5`);
+  const data = await resp.json();
+  return JSON.stringify(data);
+})()
+```
 
 Filter for messages from the user (non-bot) that are NOT in "Key Number" reply format (those are handled by the followup run).
 
-If any are found, treat them as standing instructions for this run — keep them in mind throughout Steps 5 and 6 (e.g. "don't respond to Carter", "hold off on the Singer listing"). Note any applied instructions in the Telegram summary at the end.
+If any are found, treat them as standing instructions for this run — keep them in mind throughout Steps 5 and 6 (e.g. "don't respond to Carter", "lower the price on the vase", "hold off on the Singer listing"). Note any applied instructions in the Telegram summary at the end.
 
 If none found, continue normally.
 

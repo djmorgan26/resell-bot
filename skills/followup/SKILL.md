@@ -39,17 +39,30 @@ Store this path as WORKSPACE for all subsequent steps.
 
 ---
 
-## Step 2 — Fetch the user's Recent Telegram Replies via Chrome
+## Step 2 — Fetch the user's Recent Telegram Replies
 
-**Do this first — before checking pending_actions.json.** the user's replies live in the Telegram queue and must be read before anything else. Only acknowledge them (Step 6b) after the browser replies have been sent.
+**Do this first — before checking pending_actions.json.** the user's replies must be read before anything else.
 
-Python can't reach `api.telegram.org` from the Cowork sandbox (proxy blocks it). Use Chrome JS instead.
+The Telegram poll bot (`scripts/telegram_poll_bot.py`) runs as a background service and is the **single consumer** of all Telegram updates. It saves every update it receives to `notifications/consumed_updates.json`. Read replies from that file — do NOT call `getUpdates` directly (the poll bot has already consumed those updates).
 
-**2a.** Read `TELEGRAM_BOT_TOKEN` from `[WORKSPACE]/notifications/.env`.
+**2a.** Read the user's recent messages from the consumed updates file:
 
-**2b.** Navigate Chrome to `https://example.com` — this clears any CSP restrictions from FB or eBay pages that would block the outbound fetch.
+```bash
+source [WORKSPACE]/.venv/bin/activate
+python3 - << 'EOF'
+import json, sys, os
+from dotenv import load_dotenv
+sys.path.insert(0, '[WORKSPACE]')
+load_dotenv('[WORKSPACE]/notifications/.env')
+from notifications.telegram_reader import get_consumed_messages
+msgs = get_consumed_messages(hours=6)
+print(json.dumps(msgs, default=str))
+EOF
+```
 
-**2c.** Run this JavaScript via the Chrome JS tool (substitute the real token):
+**2b.** If the consumed_updates.json file doesn't exist or the output is `[]`, fall back to Chrome JS as a backup (the poll bot may not be running):
+
+Read `TELEGRAM_BOT_TOKEN` from `[WORKSPACE]/notifications/.env`, navigate Chrome to `https://example.com`, then run:
 
 ```javascript
 (async () => {
@@ -62,13 +75,7 @@ Python can't reach `api.telegram.org` from the Cowork sandbox (proxy blocks it).
 })()
 ```
 
-**2d.** Save the returned JSON string to a temp file (always overwrite — never use a stale file from a previous run):
-
-```bash
-echo '<JSON_STRING>' > /tmp/tg_updates.json
-```
-
-**2e.** Parse it with Python to extract the user's recent messages:
+Then parse with:
 
 ```bash
 source [WORKSPACE]/.venv/bin/activate
@@ -78,14 +85,12 @@ from dotenv import load_dotenv
 sys.path.insert(0, '[WORKSPACE]')
 load_dotenv('[WORKSPACE]/notifications/.env')
 from notifications.telegram_reader import parse_updates_response
-raw = open('/tmp/tg_updates.json').read()
+raw = '<JSON_STRING>'
 chat_id = os.getenv('TELEGRAM_CHAT_ID')
 msgs = parse_updates_response(raw, hours=6, chat_id=chat_id)
 print(json.dumps(msgs, default=str))
 EOF
 ```
-
-**Important:** The `chat_id` filter ensures we only read messages from the group chat, not from personal DMs to the bot. This prevents the bot from acting on messages sent in the wrong chat.
 
 If the output is `[]` → **stop here**. the user hasn't replied yet. Exit cleanly with no Telegram message.
 
@@ -169,18 +174,7 @@ if resolved_keys:
 EOF
 ```
 
-**6b.** Acknowledge Telegram updates via Chrome JS — **only after browser replies are confirmed sent** (screenshots taken in Step 5). This removes the user's messages from the Telegram queue so they don't reappear. If Step 5 failed for any item, do NOT acknowledge — the failed item needs to stay in the queue for the next run. Get the highest `update_id` from MESSAGES, then run:
-
-```javascript
-(async () => {
-  const token = '<TELEGRAM_BOT_TOKEN>';
-  const offset = <max_update_id + 1>;
-  await fetch(
-    `https://api.telegram.org/bot${token}/getUpdates?offset=${offset}&limit=1&timeout=1`
-  );
-  return 'acknowledged';
-})()
-```
+**6b.** Telegram acknowledgment is handled automatically by the poll bot — no manual acknowledgment step needed. The consumed_updates.json file retains messages for 24 hours, so failed runs can retry on the next cycle.
 
 ---
 

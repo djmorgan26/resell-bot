@@ -1,9 +1,13 @@
 ---
 name: photo-inbox
-description: "Check Telegram for photos the user sent from their phone and download them into photo-inbox/. Run this at the start of any session or scheduled task to see if there are new items to sell. If new photos are found, hand off to skills/create-listing/SKILL.md to create listings."
+description: "Check Telegram for photos the user sent from their phone and download them into photo-inbox/. The poll bot (scripts/telegram_poll_bot.py) handles this automatically in real-time. This skill is a FALLBACK for when the poll bot isn't running. For scheduled runs, just check the filesystem for unprocessed photos instead."
 ---
 
 # Photo Inbox — Telegram Photo Retrieval
+
+> **NOTE:** The background poll bot (`scripts/telegram_poll_bot.py`) now handles real-time photo intake automatically. It downloads photos to `photo-inbox/<item>/`, groups them by caption, supports batch mode (multiple items → say "go" once), and spawns Claude research sessions. **For scheduled runs, do NOT use this skill** — just check the filesystem for unprocessed photo folders (see `skills/scheduled-runs/morning-run.md` Step 3).
+>
+> Use this skill only as a **manual fallback** when the poll bot isn't running.
 
 The user sends photos of items they want to sell directly to the Telegram bot from their phone. Each message has one or more photos and a caption naming the item (e.g. "Kitchen mixer" or "Vintage lamp").
 
@@ -13,9 +17,9 @@ This skill checks for new photo messages, downloads them, and organizes them int
 
 ## When to Run
 
-- **Start of every scheduled task** — check for new items before monitoring existing listings
-- **When the user says they sent photos** — run on demand
-- **After any Telegram notification** that mentions new photos
+- **Only if the poll bot is NOT running** — check with `launchctl list | grep resellbot`
+- **When the user says they sent photos** and the poll bot didn't pick them up
+- **NOT during scheduled runs** — use filesystem check instead (morning-run.md Step 3)
 
 ---
 

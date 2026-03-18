@@ -12,7 +12,7 @@ IMPORTANT — Cowork sandbox vs. local use:
   Outside the VM (local dev, CI), use `get_recent_messages(hours)` directly.
 
 Usage (Cowork VM — Chrome JS fetch first):
-    # Step 1: fetch via Chrome JS (see scheduled-task-prompt-followup.txt Step 3)
+    # Step 1: fetch via Chrome JS (see skills/followup/SKILL.md Step 2b)
     # Step 2: pass result to Python
     from notifications.telegram_reader import parse_updates_response
     msgs = parse_updates_response(raw_json_string, hours=2)
@@ -103,6 +103,27 @@ def parse_updates_response(
         })
 
     return messages
+
+
+def get_consumed_messages(hours: float = 6.0) -> list[dict]:
+    """
+    Read messages from the consumed_updates.json file written by the poll bot.
+
+    The poll bot is the single consumer of Telegram updates. It saves every update
+    it receives to notifications/consumed_updates.json so that other systems
+    (followup skill, etc.) can access messages that have already been acknowledged.
+
+    This is the preferred method when the poll bot is running as a background service.
+
+    Returns the same format as get_recent_messages().
+    """
+    consumed_file = Path(__file__).parent / "consumed_updates.json"
+    if not consumed_file.exists():
+        return []
+
+    raw = consumed_file.read_text()
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    return parse_updates_response(raw, hours=hours, chat_id=chat_id)
 
 
 def get_recent_messages(hours: float = 2.0) -> list[dict]:

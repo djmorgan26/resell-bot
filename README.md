@@ -4,6 +4,8 @@ An automated reselling assistant that runs on a daily schedule. It monitors your
 
 You never accept offers, finalize sales, or make commitments from your phone. The bot handles the busywork; you handle the decisions.
 
+**New here?** Start with setup below. Already set up? See the **[User Guide](USER-GUIDE.md)** for how to use Telegram, Cowork, and Claude Code day-to-day.
+
 ---
 
 ## What it does
@@ -173,10 +175,9 @@ git add resell_inventory.xlsx && git commit -m "inventory update $(date +%Y-%m-%
 
 ## Creating new listings (photos → published)
 
-Send photos of items to your Telegram bot from your phone with a caption (the item name). On the next morning run, Claude will check for new photos, research pricing, write a description, and create the listing.
+Send photos of items to your Telegram bot from your phone — each with a caption naming the item. You can send multiple items at once (batch mode). When you're done, reply "go" and the bot researches, prices, and drafts listings for all of them in a single session.
 
-Or start it manually in Cowork:
-> "Follow the create-listing skill at `skills/create-listing/SKILL.md`"
+See the **[User Guide](USER-GUIDE.md)** for the full workflow, including batch mode and pricing details.
 
 ---
 

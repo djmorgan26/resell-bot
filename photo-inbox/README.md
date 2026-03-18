@@ -3,7 +3,7 @@
 **Staging area for new items waiting to be listed.**
 
 Photos land here before a listing has been created. They get here two ways:
-- **Automatically** — the user sends photos to the Telegram bot from their phone; the photo-inbox skill downloads them
+- **Automatically** — the user sends photos to the Telegram bot from their phone; the **poll bot** (`scripts/telegram_poll_bot.py`) downloads them
 - **Manually** — the user drops photos directly into a subfolder here
 
 ## Structure

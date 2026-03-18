@@ -15,6 +15,7 @@ Credentials flow:
 import logging
 import os
 from pathlib import Path
+from typing import Optional
 
 from dotenv import load_dotenv
 
@@ -26,8 +27,8 @@ logger = logging.getLogger(__name__)
 _env_path = Path(__file__).parent / ".env"
 load_dotenv(dotenv_path=_env_path)
 
-_token: str | None = None
-_chat_id: str | None = None
+_token: Optional[str] = None
+_chat_id: Optional[str] = None
 
 
 def _load_secrets() -> None:

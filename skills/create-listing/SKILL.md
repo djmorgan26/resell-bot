@@ -111,7 +111,27 @@ Always recommend which tier makes sense based on context (if the user wants to c
 
 ## Stage 5: Generate the Listing
 
-Create a complete listing draft optimized for the target marketplace. The listing should follow these best practices:
+Create listing drafts for the target marketplace(s). Check `config.yaml` → `marketplaces` to see which platforms the user sells on. **If both eBay and FB Marketplace are enabled, generate drafts for both** unless the item clearly doesn't fit one platform.
+
+### Which items go where
+
+| Item type | eBay | FB Marketplace | Why |
+|---|---|---|---|
+| Rugs, antiques, collectibles | Yes | Yes | eBay has national reach for niche buyers; FB gets local no-shipping sales |
+| Furniture (large/heavy) | Maybe | Yes | Shipping cost kills eBay margins; FB is local pickup |
+| Electronics, brand-name goods | Yes | Yes | Both work well |
+| Cheap/bulky items (< $30) | No | Yes | eBay fees + shipping don't make sense |
+| Rare/specialty items | Yes | Maybe | eBay's search brings niche collectors; FB is more casual |
+
+When listing on both, note that **prices can differ** — FB Marketplace is typically 10-20% lower (no fees, local pickup, buyers expect deals). Set the eBay price at Market Price and the FB price slightly below.
+
+### Shipping vs. Local Pickup
+
+**Default to local pickup only** on all listings unless the user explicitly says otherwise. This applies to both eBay and FB Marketplace.
+
+If an item would benefit from offering shipping (e.g. small, lightweight, rare/niche item that has few local buyers), **notify the user via Telegram first** explaining why before enabling shipping. Don't just add shipping on your own.
+
+On eBay, set listings to "Local Pickup Only." On FB Marketplace, local pickup is already the default.
 
 ### Title (max 80 chars for eBay)
 - Lead with brand/model
@@ -149,20 +169,23 @@ Recommend which photos to use and in what order (lead with the best overall shot
 
 ## Stage 6: Publish
 
+If the item should go on multiple marketplaces (see Stage 5 guidance), publish to **each one**. Create separate inventory entries or update the same entry with multiple listing URLs.
+
 Two modes depending on what's available:
 
 ### Mode A: Browser-assisted (Claude in Chrome)
 If browser tools are available:
-1. Navigate to the marketplace (eBay sell page, Facebook Marketplace create listing)
+1. Navigate to the first marketplace (eBay sell page or Facebook Marketplace create listing)
 2. Fill in the listing form fields
 3. Upload photos
-4. Set the price
+4. Set the price (use marketplace-appropriate price — FB can be slightly lower)
 5. Pause before final submission so the user can review
+6. **Repeat for the second marketplace** if listing on both
 
 ### Mode B: Guided manual posting
 If no browser access:
 1. Provide all listing content formatted and ready to copy-paste
-2. Give step-by-step instructions for the specific marketplace
+2. If listing on both platforms, provide **separate drafts** for each (titles/prices may differ)
 3. List the photos to upload in order
 4. Remind the user of any marketplace-specific settings (shipping, returns, etc.)
 
@@ -172,10 +195,10 @@ Track all items in an inventory spreadsheet. After generating a listing, update 
 - Item name and description
 - Photos location
 - Price (recommended and actual listed price)
-- Marketplace(s) listed on
+- Marketplace(s) listed on (e.g. "eBay, FB Marketplace" if both)
 - Date listed
 - Status (draft / listed / sold / expired)
-- Listing URL
+- Listing URL(s) — if listed on both platforms, include both URLs
 
 The inventory tracker lives at: `[workspace]/resell_inventory.xlsx`
 

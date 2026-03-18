@@ -7,14 +7,14 @@ When the user sends photos, it asks for confirmation, then spawns a `claude` CLI
 session to research, price, and document the item in the inventory spreadsheet.
 
 Supports BATCH MODE: send photos for multiple items (each with a distinct caption),
-then say "go" once to research all of them in parallel.
+then say "go" once to research all of them in a single session.
 
 Flow:
   1. User sends photo(s) with captions to the Telegram bot (one caption per item)
   2. Bot groups photos by caption — each distinct caption = one item
   3. Bot replies with a summary of all queued items
   4. User replies 'go' (or 'yes', 'list', etc.)
-  5. Bot downloads photos and spawns a Claude session for EACH item in parallel
+  5. Bot downloads photos and spawns ONE Claude session to handle all items
   6. Claude researches comps, prices it, writes listing draft, updates inventory
   7. Claude sends Telegram summary with item details and next steps
 
@@ -353,7 +353,7 @@ def handle_update(update: dict) -> None:
             send_reply(
                 f"On it! Researching {count} item(s) ({total_photos} photos total):\n\n"
                 f"{items_list}\n\n"
-                f"I'll research each one in parallel. You'll get updates as they finish.",
+                f"I'll research them all and send updates as I go.",
                 reply_to=message_id,
             )
 
@@ -529,6 +529,9 @@ def _spawn_claude(prompt: str, log_name: str, label: str) -> None:
     Uses -p (print) mode which is non-interactive. No Chrome — uses WebSearch
     for market research. Publishing is handled separately by Cowork or the
     morning scheduled run.
+
+    The prompt is piped via stdin to avoid shell escaping issues with special
+    characters in item captions (quotes, dimensions like 37 1/2" x 56").
     """
     cmd = [
         "claude",
@@ -537,19 +540,23 @@ def _spawn_claude(prompt: str, log_name: str, label: str) -> None:
         "--model", "sonnet",
         "--allowedTools",
         "Bash,Read,Write,Edit,Glob,Grep,WebSearch,WebFetch",
-        prompt,
     ]
 
     log.info(f"Spawning Claude session for '{label}'")
     try:
         log_path = REPO_ROOT / "logs" / f"{log_name}.log"
-        subprocess.Popen(
+        log_file = open(log_path, "w")
+        proc = subprocess.Popen(
             cmd,
             cwd=str(REPO_ROOT),
-            stdout=open(log_path, "w"),
+            stdin=subprocess.PIPE,
+            stdout=log_file,
             stderr=subprocess.STDOUT,
         )
-        log.info(f"Claude session started — log: {log_path}")
+        # Write prompt to stdin and close to signal EOF
+        proc.stdin.write(prompt.encode("utf-8"))
+        proc.stdin.close()
+        log.info(f"Claude session started (PID {proc.pid}) — log: {log_path}")
     except Exception as e:
         log.error(f"Failed to start Claude session: {e}")
         send_reply(f"Something went wrong starting the process: {e}")

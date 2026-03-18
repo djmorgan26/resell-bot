@@ -1,0 +1,1427 @@
+{
+  "ok": true,
+  "result": [
+    {
+      "update_id": 819507762,
+      "message": {
+        "message_id": 65,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773794948,
+        "media_group_id": "14190359586427273",
+        "photo": [
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANBabn2hBgl5LCqSWCFSq9_MiqR3SsAAjMMaxvov9BFYKygW5w7n6kBAAMCAANzAAM6BA",
+            "file_unique_id": "AQADMwxrG-i_0EV4",
+            "file_size": 1511,
+            "width": 67,
+            "height": 90
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANBabn2hBgl5LCqSWCFSq9_MiqR3SsAAjMMaxvov9BFYKygW5w7n6kBAAMCAANtAAM6BA",
+            "file_unique_id": "AQADMwxrG-i_0EVy",
+            "file_size": 37697,
+            "width": 240,
+            "height": 320
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANBabn2hBgl5LCqSWCFSq9_MiqR3SsAAjMMaxvov9BFYKygW5w7n6kBAAMCAAN4AAM6BA",
+            "file_unique_id": "AQADMwxrG-i_0EV9",
+            "file_size": 233154,
+            "width": 600,
+            "height": 800
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANBabn2hBgl5LCqSWCFSq9_MiqR3SsAAjMMaxvov9BFYKygW5w7n6kBAAMCAAN5AAM6BA",
+            "file_unique_id": "AQADMwxrG-i_0EV-",
+            "file_size": 351815,
+            "width": 960,
+            "height": 1280
+          }
+        ],
+        "caption": "Oriental 37 1/2\" x 56 1/2\""
+      }
+    },
+    {
+      "update_id": 819507763,
+      "message": {
+        "message_id": 66,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773794948,
+        "media_group_id": "14190359586427273",
+        "photo": [
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANCabn2hGbITKCwrhE4h0L9PZpKI6sAAjQMaxvov9BFOzpQLTu4mpABAAMCAANzAAM6BA",
+            "file_unique_id": "AQADNAxrG-i_0EV4",
+            "file_size": 1214,
+            "width": 67,
+            "height": 90
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANCabn2hGbITKCwrhE4h0L9PZpKI6sAAjQMaxvov9BFOzpQLTu4mpABAAMCAANtAAM6BA",
+            "file_unique_id": "AQADNAxrG-i_0EVy",
+            "file_size": 26202,
+            "width": 240,
+            "height": 320
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANCabn2hGbITKCwrhE4h0L9PZpKI6sAAjQMaxvov9BFOzpQLTu4mpABAAMCAAN4AAM6BA",
+            "file_unique_id": "AQADNAxrG-i_0EV9",
+            "file_size": 174834,
+            "width": 600,
+            "height": 800
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANCabn2hGbITKCwrhE4h0L9PZpKI6sAAjQMaxvov9BFOzpQLTu4mpABAAMCAAN5AAM6BA",
+            "file_unique_id": "AQADNAxrG-i_0EV-",
+            "file_size": 271970,
+            "width": 960,
+            "height": 1280
+          }
+        ]
+      }
+    },
+    {
+      "update_id": 819507764,
+      "message": {
+        "message_id": 68,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795030,
+        "media_group_id": "14190360246786041",
+        "photo": [
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANEabn21qsTV1xMMNYOlNtMJn_H_I4AAjUMaxvov9BF1axpqAPfF3MBAAMCAANzAAM6BA",
+            "file_unique_id": "AQADNQxrG-i_0EV4",
+            "file_size": 1103,
+            "width": 90,
+            "height": 67
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANEabn21qsTV1xMMNYOlNtMJn_H_I4AAjUMaxvov9BF1axpqAPfF3MBAAMCAANtAAM6BA",
+            "file_unique_id": "AQADNQxrG-i_0EVy",
+            "file_size": 23912,
+            "width": 320,
+            "height": 240
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANEabn21qsTV1xMMNYOlNtMJn_H_I4AAjUMaxvov9BF1axpqAPfF3MBAAMCAAN4AAM6BA",
+            "file_unique_id": "AQADNQxrG-i_0EV9",
+            "file_size": 151440,
+            "width": 800,
+            "height": 600
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANEabn21qsTV1xMMNYOlNtMJn_H_I4AAjUMaxvov9BF1axpqAPfF3MBAAMCAAN5AAM6BA",
+            "file_unique_id": "AQADNQxrG-i_0EV-",
+            "file_size": 230997,
+            "width": 1280,
+            "height": 960
+          }
+        ],
+        "caption": "Stone top coffee table with built in lower shelf. Matching side table. Coffee table: 49\" x 29 1/2\". Good condition.  Side table: 27\" x 27\""
+      }
+    },
+    {
+      "update_id": 819507765,
+      "message": {
+        "message_id": 69,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795030,
+        "media_group_id": "14190360246786041",
+        "photo": [
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANFabn21r_UZbrqe6QodaThbcMHfEAAAjYMaxvov9BFUk5tsaNBz9IBAAMCAANzAAM6BA",
+            "file_unique_id": "AQADNgxrG-i_0EV4",
+            "file_size": 1360,
+            "width": 90,
+            "height": 67
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANFabn21r_UZbrqe6QodaThbcMHfEAAAjYMaxvov9BFUk5tsaNBz9IBAAMCAANtAAM6BA",
+            "file_unique_id": "AQADNgxrG-i_0EVy",
+            "file_size": 26762,
+            "width": 320,
+            "height": 240
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANFabn21r_UZbrqe6QodaThbcMHfEAAAjYMaxvov9BFUk5tsaNBz9IBAAMCAAN4AAM6BA",
+            "file_unique_id": "AQADNgxrG-i_0EV9",
+            "file_size": 155910,
+            "width": 800,
+            "height": 600
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANFabn21r_UZbrqe6QodaThbcMHfEAAAjYMaxvov9BFUk5tsaNBz9IBAAMCAAN5AAM6BA",
+            "file_unique_id": "AQADNgxrG-i_0EV-",
+            "file_size": 230681,
+            "width": 1280,
+            "height": 960
+          }
+        ]
+      }
+    },
+    {
+      "update_id": 819507766,
+      "message": {
+        "message_id": 70,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795030,
+        "media_group_id": "14190360246786041",
+        "photo": [
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANGabn21nMC4f4R3GOFZ9_5piebaMwAAjcMaxvov9BFNTNjrZLArEoBAAMCAANzAAM6BA",
+            "file_unique_id": "AQADNwxrG-i_0EV4",
+            "file_size": 1011,
+            "width": 67,
+            "height": 90
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANGabn21nMC4f4R3GOFZ9_5piebaMwAAjcMaxvov9BFNTNjrZLArEoBAAMCAANtAAM6BA",
+            "file_unique_id": "AQADNwxrG-i_0EVy",
+            "file_size": 20741,
+            "width": 240,
+            "height": 320
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANGabn21nMC4f4R3GOFZ9_5piebaMwAAjcMaxvov9BFNTNjrZLArEoBAAMCAAN4AAM6BA",
+            "file_unique_id": "AQADNwxrG-i_0EV9",
+            "file_size": 129048,
+            "width": 600,
+            "height": 800
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANGabn21nMC4f4R3GOFZ9_5piebaMwAAjcMaxvov9BFNTNjrZLArEoBAAMCAAN5AAM6BA",
+            "file_unique_id": "AQADNwxrG-i_0EV-",
+            "file_size": 192711,
+            "width": 960,
+            "height": 1280
+          }
+        ]
+      }
+    },
+    {
+      "update_id": 819507767,
+      "message": {
+        "message_id": 72,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795068,
+        "media_group_id": "14190360550662361",
+        "photo": [
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANIabn2_I42oI1BAjVBYxwxnRCATroAAjgMaxvov9BF0V7JvpWnKQIBAAMCAANzAAM6BA",
+            "file_unique_id": "AQADOAxrG-i_0EV4",
+            "file_size": 1428,
+            "width": 67,
+            "height": 90
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANIabn2_I42oI1BAjVBYxwxnRCATroAAjgMaxvov9BF0V7JvpWnKQIBAAMCAANtAAM6BA",
+            "file_unique_id": "AQADOAxrG-i_0EVy",
+            "file_size": 37936,
+            "width": 240,
+            "height": 320
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANIabn2_I42oI1BAjVBYxwxnRCATroAAjgMaxvov9BF0V7JvpWnKQIBAAMCAAN4AAM6BA",
+            "file_unique_id": "AQADOAxrG-i_0EV9",
+            "file_size": 232649,
+            "width": 600,
+            "height": 800
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANIabn2_I42oI1BAjVBYxwxnRCATroAAjgMaxvov9BF0V7JvpWnKQIBAAMCAAN5AAM6BA",
+            "file_unique_id": "AQADOAxrG-i_0EV-",
+            "file_size": 344588,
+            "width": 960,
+            "height": 1280
+          }
+        ],
+        "caption": "Rug 30 1/2\" x 57\""
+      }
+    },
+    {
+      "update_id": 819507768,
+      "message": {
+        "message_id": 73,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795068,
+        "media_group_id": "14190360550662361",
+        "photo": [
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANJabn2_DcF8-fB-7V7XeeRcOgGH0cAAjkMaxvov9BFdWnq2D6XJ_gBAAMCAANzAAM6BA",
+            "file_unique_id": "AQADOQxrG-i_0EV4",
+            "file_size": 1366,
+            "width": 67,
+            "height": 90
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANJabn2_DcF8-fB-7V7XeeRcOgGH0cAAjkMaxvov9BFdWnq2D6XJ_gBAAMCAANtAAM6BA",
+            "file_unique_id": "AQADOQxrG-i_0EVy",
+            "file_size": 36642,
+            "width": 240,
+            "height": 320
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANJabn2_DcF8-fB-7V7XeeRcOgGH0cAAjkMaxvov9BFdWnq2D6XJ_gBAAMCAAN4AAM6BA",
+            "file_unique_id": "AQADOQxrG-i_0EV9",
+            "file_size": 231211,
+            "width": 600,
+            "height": 800
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANJabn2_DcF8-fB-7V7XeeRcOgGH0cAAjkMaxvov9BFdWnq2D6XJ_gBAAMCAAN5AAM6BA",
+            "file_unique_id": "AQADOQxrG-i_0EV-",
+            "file_size": 345416,
+            "width": 960,
+            "height": 1280
+          }
+        ]
+      }
+    },
+    {
+      "update_id": 819507769,
+      "message": {
+        "message_id": 75,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795121,
+        "media_group_id": "14190360975172329",
+        "photo": [
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANLabn3Mffd7N0epThrjVwVEDnV-h8AAjsMaxvov9BFpjS2Yu2Y5GQBAAMCAANzAAM6BA",
+            "file_unique_id": "AQADOwxrG-i_0EV4",
+            "file_size": 1668,
+            "width": 67,
+            "height": 90
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANLabn3Mffd7N0epThrjVwVEDnV-h8AAjsMaxvov9BFpjS2Yu2Y5GQBAAMCAANtAAM6BA",
+            "file_unique_id": "AQADOwxrG-i_0EVy",
+            "file_size": 39633,
+            "width": 240,
+            "height": 320
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANLabn3Mffd7N0epThrjVwVEDnV-h8AAjsMaxvov9BFpjS2Yu2Y5GQBAAMCAAN4AAM6BA",
+            "file_unique_id": "AQADOwxrG-i_0EV9",
+            "file_size": 238580,
+            "width": 600,
+            "height": 800
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANLabn3Mffd7N0epThrjVwVEDnV-h8AAjsMaxvov9BFpjS2Yu2Y5GQBAAMCAAN5AAM6BA",
+            "file_unique_id": "AQADOwxrG-i_0EV-",
+            "file_size": 363229,
+            "width": 960,
+            "height": 1280
+          }
+        ],
+        "caption": "Oriental rug 39\" x 39\""
+      }
+    },
+    {
+      "update_id": 819507770,
+      "message": {
+        "message_id": 76,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795121,
+        "media_group_id": "14190360975172329",
+        "photo": [
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANMabn3MbA_KzTftoN6ff4GottXemQAAjwMaxvov9BF2nMvMwmUcRcBAAMCAANzAAM6BA",
+            "file_unique_id": "AQADPAxrG-i_0EV4",
+            "file_size": 1584,
+            "width": 67,
+            "height": 90
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANMabn3MbA_KzTftoN6ff4GottXemQAAjwMaxvov9BF2nMvMwmUcRcBAAMCAANtAAM6BA",
+            "file_unique_id": "AQADPAxrG-i_0EVy",
+            "file_size": 38523,
+            "width": 240,
+            "height": 320
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANMabn3MbA_KzTftoN6ff4GottXemQAAjwMaxvov9BF2nMvMwmUcRcBAAMCAAN4AAM6BA",
+            "file_unique_id": "AQADPAxrG-i_0EV9",
+            "file_size": 234733,
+            "width": 600,
+            "height": 800
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANMabn3MbA_KzTftoN6ff4GottXemQAAjwMaxvov9BF2nMvMwmUcRcBAAMCAAN5AAM6BA",
+            "file_unique_id": "AQADPAxrG-i_0EV-",
+            "file_size": 353211,
+            "width": 960,
+            "height": 1280
+          }
+        ]
+      }
+    },
+    {
+      "update_id": 819507771,
+      "message": {
+        "message_id": 78,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795166,
+        "media_group_id": "14190361329500377",
+        "photo": [
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANOabn3Xv_AjeZwhUsOD-QUxDqCTMcAAj0Maxvov9BFaS0mhIznJLsBAAMCAANzAAM6BA",
+            "file_unique_id": "AQADPQxrG-i_0EV4",
+            "file_size": 1604,
+            "width": 67,
+            "height": 90
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANOabn3Xv_AjeZwhUsOD-QUxDqCTMcAAj0Maxvov9BFaS0mhIznJLsBAAMCAANtAAM6BA",
+            "file_unique_id": "AQADPQxrG-i_0EVy",
+            "file_size": 39543,
+            "width": 240,
+            "height": 320
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANOabn3Xv_AjeZwhUsOD-QUxDqCTMcAAj0Maxvov9BFaS0mhIznJLsBAAMCAAN4AAM6BA",
+            "file_unique_id": "AQADPQxrG-i_0EV9",
+            "file_size": 234449,
+            "width": 600,
+            "height": 800
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANOabn3Xv_AjeZwhUsOD-QUxDqCTMcAAj0Maxvov9BFaS0mhIznJLsBAAMCAAN5AAM6BA",
+            "file_unique_id": "AQADPQxrG-i_0EV-",
+            "file_size": 347828,
+            "width": 960,
+            "height": 1280
+          }
+        ],
+        "caption": "Oriental rug 30\" x 55 1/2\""
+      }
+    },
+    {
+      "update_id": 819507772,
+      "message": {
+        "message_id": 79,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795166,
+        "media_group_id": "14190361329500377",
+        "photo": [
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANPabn3XuXHOUUT35HduLAJacwNth8AAj4Maxvov9BFh51bVczkAnUBAAMCAANzAAM6BA",
+            "file_unique_id": "AQADPgxrG-i_0EV4",
+            "file_size": 1626,
+            "width": 90,
+            "height": 67
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANPabn3XuXHOUUT35HduLAJacwNth8AAj4Maxvov9BFh51bVczkAnUBAAMCAANtAAM6BA",
+            "file_unique_id": "AQADPgxrG-i_0EVy",
+            "file_size": 38527,
+            "width": 320,
+            "height": 240
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANPabn3XuXHOUUT35HduLAJacwNth8AAj4Maxvov9BFh51bVczkAnUBAAMCAAN4AAM6BA",
+            "file_unique_id": "AQADPgxrG-i_0EV9",
+            "file_size": 230650,
+            "width": 800,
+            "height": 600
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANPabn3XuXHOUUT35HduLAJacwNth8AAj4Maxvov9BFh51bVczkAnUBAAMCAAN5AAM6BA",
+            "file_unique_id": "AQADPgxrG-i_0EV-",
+            "file_size": 347184,
+            "width": 1280,
+            "height": 960
+          }
+        ]
+      }
+    },
+    {
+      "update_id": 819507773,
+      "message": {
+        "message_id": 81,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795217,
+        "media_group_id": "14190361741235577",
+        "photo": [
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANRabn3kQbXEj6XrCxbebe-zr0Zk14AAj8Maxvov9BFOjxKpOV0KywBAAMCAANzAAM6BA",
+            "file_unique_id": "AQADPwxrG-i_0EV4",
+            "file_size": 2038,
+            "width": 67,
+            "height": 90
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANRabn3kQbXEj6XrCxbebe-zr0Zk14AAj8Maxvov9BFOjxKpOV0KywBAAMCAANtAAM6BA",
+            "file_unique_id": "AQADPwxrG-i_0EVy",
+            "file_size": 44161,
+            "width": 240,
+            "height": 320
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANRabn3kQbXEj6XrCxbebe-zr0Zk14AAj8Maxvov9BFOjxKpOV0KywBAAMCAAN4AAM6BA",
+            "file_unique_id": "AQADPwxrG-i_0EV9",
+            "file_size": 235894,
+            "width": 600,
+            "height": 800
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANRabn3kQbXEj6XrCxbebe-zr0Zk14AAj8Maxvov9BFOjxKpOV0KywBAAMCAAN5AAM6BA",
+            "file_unique_id": "AQADPwxrG-i_0EV-",
+            "file_size": 337565,
+            "width": 960,
+            "height": 1280
+          }
+        ],
+        "caption": "Oriental rug 28\" x 44\""
+      }
+    },
+    {
+      "update_id": 819507774,
+      "message": {
+        "message_id": 82,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795217,
+        "media_group_id": "14190361741235577",
+        "photo": [
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANSabn3kYDqkWRgv_t8Elj68q1snBwAAkAMaxvov9BFu8iGtbQQUt0BAAMCAANzAAM6BA",
+            "file_unique_id": "AQADQAxrG-i_0EV4",
+            "file_size": 1956,
+            "width": 67,
+            "height": 90
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANSabn3kYDqkWRgv_t8Elj68q1snBwAAkAMaxvov9BFu8iGtbQQUt0BAAMCAANtAAM6BA",
+            "file_unique_id": "AQADQAxrG-i_0EVy",
+            "file_size": 44379,
+            "width": 240,
+            "height": 320
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANSabn3kYDqkWRgv_t8Elj68q1snBwAAkAMaxvov9BFu8iGtbQQUt0BAAMCAAN4AAM6BA",
+            "file_unique_id": "AQADQAxrG-i_0EV9",
+            "file_size": 245819,
+            "width": 600,
+            "height": 800
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANSabn3kYDqkWRgv_t8Elj68q1snBwAAkAMaxvov9BFu8iGtbQQUt0BAAMCAAN5AAM6BA",
+            "file_unique_id": "AQADQAxrG-i_0EV-",
+            "file_size": 357327,
+            "width": 960,
+            "height": 1280
+          }
+        ]
+      }
+    },
+    {
+      "update_id": 819507775,
+      "message": {
+        "message_id": 84,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795256,
+        "media_group_id": "14190362054074393",
+        "photo": [
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANUabn3uCYlq_lsrS0wgdaP3sGaPNwAAkEMaxvov9BFW0VRIMfDRpABAAMCAANzAAM6BA",
+            "file_unique_id": "AQADQQxrG-i_0EV4",
+            "file_size": 1706,
+            "width": 90,
+            "height": 67
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANUabn3uCYlq_lsrS0wgdaP3sGaPNwAAkEMaxvov9BFW0VRIMfDRpABAAMCAANtAAM6BA",
+            "file_unique_id": "AQADQQxrG-i_0EVy",
+            "file_size": 45123,
+            "width": 320,
+            "height": 240
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANUabn3uCYlq_lsrS0wgdaP3sGaPNwAAkEMaxvov9BFW0VRIMfDRpABAAMCAAN4AAM6BA",
+            "file_unique_id": "AQADQQxrG-i_0EV9",
+            "file_size": 281962,
+            "width": 800,
+            "height": 600
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANUabn3uCYlq_lsrS0wgdaP3sGaPNwAAkEMaxvov9BFW0VRIMfDRpABAAMCAAN5AAM6BA",
+            "file_unique_id": "AQADQQxrG-i_0EV-",
+            "file_size": 416625,
+            "width": 1280,
+            "height": 960
+          }
+        ],
+        "caption": "Oriental rug 29\" x 37\""
+      }
+    },
+    {
+      "update_id": 819507776,
+      "message": {
+        "message_id": 85,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795256,
+        "media_group_id": "14190362054074393",
+        "photo": [
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANVabn3uK7Qrgsb2t_K9gABhDehdhlHAAJCDGsb6L_QRZOR-xfN06pIAQADAgADcwADOgQ",
+            "file_unique_id": "AQADQgxrG-i_0EV4",
+            "file_size": 1651,
+            "width": 67,
+            "height": 90
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANVabn3uK7Qrgsb2t_K9gABhDehdhlHAAJCDGsb6L_QRZOR-xfN06pIAQADAgADbQADOgQ",
+            "file_unique_id": "AQADQgxrG-i_0EVy",
+            "file_size": 30506,
+            "width": 240,
+            "height": 320
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANVabn3uK7Qrgsb2t_K9gABhDehdhlHAAJCDGsb6L_QRZOR-xfN06pIAQADAgADeAADOgQ",
+            "file_unique_id": "AQADQgxrG-i_0EV9",
+            "file_size": 156155,
+            "width": 600,
+            "height": 800
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANVabn3uK7Qrgsb2t_K9gABhDehdhlHAAJCDGsb6L_QRZOR-xfN06pIAQADAgADeQADOgQ",
+            "file_unique_id": "AQADQgxrG-i_0EV-",
+            "file_size": 225546,
+            "width": 960,
+            "height": 1280
+          }
+        ]
+      }
+    },
+    {
+      "update_id": 819507777,
+      "message": {
+        "message_id": 86,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795256,
+        "media_group_id": "14190362054074393",
+        "photo": [
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANWabn3uKI4j6goFpiCiTZWHA7Y1zwAAkMMaxvov9BFX9elwym_Xb4BAAMCAANzAAM6BA",
+            "file_unique_id": "AQADQwxrG-i_0EV4",
+            "file_size": 1714,
+            "width": 67,
+            "height": 90
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANWabn3uKI4j6goFpiCiTZWHA7Y1zwAAkMMaxvov9BFX9elwym_Xb4BAAMCAANtAAM6BA",
+            "file_unique_id": "AQADQwxrG-i_0EVy",
+            "file_size": 31518,
+            "width": 240,
+            "height": 320
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANWabn3uKI4j6goFpiCiTZWHA7Y1zwAAkMMaxvov9BFX9elwym_Xb4BAAMCAAN4AAM6BA",
+            "file_unique_id": "AQADQwxrG-i_0EV9",
+            "file_size": 168277,
+            "width": 600,
+            "height": 800
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANWabn3uKI4j6goFpiCiTZWHA7Y1zwAAkMMaxvov9BFX9elwym_Xb4BAAMCAAN5AAM6BA",
+            "file_unique_id": "AQADQwxrG-i_0EV-",
+            "file_size": 246046,
+            "width": 960,
+            "height": 1280
+          }
+        ]
+      }
+    },
+    {
+      "update_id": 819507778,
+      "message": {
+        "message_id": 87,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795256,
+        "media_group_id": "14190362054074393",
+        "photo": [
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANXabn3uOf2otaWl3j_Nl8DJMbLA20AAkQMaxvov9BFj5D6MpbWCQEBAAMCAANzAAM6BA",
+            "file_unique_id": "AQADRAxrG-i_0EV4",
+            "file_size": 1806,
+            "width": 67,
+            "height": 90
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANXabn3uOf2otaWl3j_Nl8DJMbLA20AAkQMaxvov9BFj5D6MpbWCQEBAAMCAANtAAM6BA",
+            "file_unique_id": "AQADRAxrG-i_0EVy",
+            "file_size": 46044,
+            "width": 240,
+            "height": 320
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANXabn3uOf2otaWl3j_Nl8DJMbLA20AAkQMaxvov9BFj5D6MpbWCQEBAAMCAAN4AAM6BA",
+            "file_unique_id": "AQADRAxrG-i_0EV9",
+            "file_size": 273182,
+            "width": 600,
+            "height": 800
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANXabn3uOf2otaWl3j_Nl8DJMbLA20AAkQMaxvov9BFj5D6MpbWCQEBAAMCAAN5AAM6BA",
+            "file_unique_id": "AQADRAxrG-i_0EV-",
+            "file_size": 397919,
+            "width": 960,
+            "height": 1280
+          }
+        ]
+      }
+    },
+    {
+      "update_id": 819507779,
+      "message": {
+        "message_id": 89,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795285,
+        "media_group_id": "14190362283222873",
+        "photo": [
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANZabn31THyF4IqjF13PO8W7mY7y9kAAkUMaxvov9BF5U2-ltQIUeoBAAMCAANzAAM6BA",
+            "file_unique_id": "AQADRQxrG-i_0EV4",
+            "file_size": 1671,
+            "width": 67,
+            "height": 90
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANZabn31THyF4IqjF13PO8W7mY7y9kAAkUMaxvov9BF5U2-ltQIUeoBAAMCAANtAAM6BA",
+            "file_unique_id": "AQADRQxrG-i_0EVy",
+            "file_size": 45260,
+            "width": 240,
+            "height": 320
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANZabn31THyF4IqjF13PO8W7mY7y9kAAkUMaxvov9BF5U2-ltQIUeoBAAMCAAN4AAM6BA",
+            "file_unique_id": "AQADRQxrG-i_0EV9",
+            "file_size": 276018,
+            "width": 600,
+            "height": 800
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANZabn31THyF4IqjF13PO8W7mY7y9kAAkUMaxvov9BF5U2-ltQIUeoBAAMCAAN5AAM6BA",
+            "file_unique_id": "AQADRQxrG-i_0EV-",
+            "file_size": 406866,
+            "width": 960,
+            "height": 1280
+          }
+        ],
+        "caption": "Oriental rug 29\" x 35\""
+      }
+    },
+    {
+      "update_id": 819507780,
+      "message": {
+        "message_id": 90,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795285,
+        "media_group_id": "14190362283222873",
+        "photo": [
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANaabn31ZCOh0th7mE9fcx-i5OcS1AAAkYMaxvov9BF7-5Twpe1vTsBAAMCAANzAAM6BA",
+            "file_unique_id": "AQADRgxrG-i_0EV4",
+            "file_size": 1679,
+            "width": 67,
+            "height": 90
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANaabn31ZCOh0th7mE9fcx-i5OcS1AAAkYMaxvov9BF7-5Twpe1vTsBAAMCAANtAAM6BA",
+            "file_unique_id": "AQADRgxrG-i_0EVy",
+            "file_size": 46284,
+            "width": 240,
+            "height": 320
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANaabn31ZCOh0th7mE9fcx-i5OcS1AAAkYMaxvov9BF7-5Twpe1vTsBAAMCAAN4AAM6BA",
+            "file_unique_id": "AQADRgxrG-i_0EV9",
+            "file_size": 273478,
+            "width": 600,
+            "height": 800
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANaabn31ZCOh0th7mE9fcx-i5OcS1AAAkYMaxvov9BF7-5Twpe1vTsBAAMCAAN5AAM6BA",
+            "file_unique_id": "AQADRgxrG-i_0EV-",
+            "file_size": 401028,
+            "width": 960,
+            "height": 1280
+          }
+        ]
+      }
+    },
+    {
+      "update_id": 819507781,
+      "message": {
+        "message_id": 92,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795330,
+        "media_group_id": "14190362642359041",
+        "photo": [
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANcabn4Ak5fycmC0xLAbk2KYKKfi5MAAkcMaxvov9BFMO6-16kVLBwBAAMCAANzAAM6BA",
+            "file_unique_id": "AQADRwxrG-i_0EV4",
+            "file_size": 1549,
+            "width": 67,
+            "height": 90
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANcabn4Ak5fycmC0xLAbk2KYKKfi5MAAkcMaxvov9BFMO6-16kVLBwBAAMCAANtAAM6BA",
+            "file_unique_id": "AQADRwxrG-i_0EVy",
+            "file_size": 32165,
+            "width": 240,
+            "height": 320
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANcabn4Ak5fycmC0xLAbk2KYKKfi5MAAkcMaxvov9BFMO6-16kVLBwBAAMCAAN4AAM6BA",
+            "file_unique_id": "AQADRwxrG-i_0EV9",
+            "file_size": 200151,
+            "width": 600,
+            "height": 800
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANcabn4Ak5fycmC0xLAbk2KYKKfi5MAAkcMaxvov9BFMO6-16kVLBwBAAMCAAN5AAM6BA",
+            "file_unique_id": "AQADRwxrG-i_0EV-",
+            "file_size": 301446,
+            "width": 960,
+            "height": 1280
+          }
+        ],
+        "caption": "Oriental bag 27\" x 29\""
+      }
+    },
+    {
+      "update_id": 819507782,
+      "message": {
+        "message_id": 93,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795330,
+        "media_group_id": "14190362642359041",
+        "photo": [
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANdabn4AqbSijXjPClFfEoAAcIeK7aVAAJIDGsb6L_QRZhUpu4ghQooAQADAgADcwADOgQ",
+            "file_unique_id": "AQADSAxrG-i_0EV4",
+            "file_size": 1486,
+            "width": 90,
+            "height": 67
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANdabn4AqbSijXjPClFfEoAAcIeK7aVAAJIDGsb6L_QRZhUpu4ghQooAQADAgADbQADOgQ",
+            "file_unique_id": "AQADSAxrG-i_0EVy",
+            "file_size": 35667,
+            "width": 320,
+            "height": 240
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANdabn4AqbSijXjPClFfEoAAcIeK7aVAAJIDGsb6L_QRZhUpu4ghQooAQADAgADeAADOgQ",
+            "file_unique_id": "AQADSAxrG-i_0EV9",
+            "file_size": 221912,
+            "width": 800,
+            "height": 600
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANdabn4AqbSijXjPClFfEoAAcIeK7aVAAJIDGsb6L_QRZhUpu4ghQooAQADAgADeQADOgQ",
+            "file_unique_id": "AQADSAxrG-i_0EV-",
+            "file_size": 335319,
+            "width": 1280,
+            "height": 960
+          }
+        ]
+      }
+    },
+    {
+      "update_id": 819507783,
+      "message": {
+        "message_id": 95,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795377,
+        "media_group_id": "14190363016840657",
+        "photo": [
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANfabn4MeGi412jUCfKH5fzfiYSjxAAAkkMaxvov9BF5_5d0Jl4QUkBAAMCAANzAAM6BA",
+            "file_unique_id": "AQADSQxrG-i_0EV4",
+            "file_size": 1636,
+            "width": 67,
+            "height": 90
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANfabn4MeGi412jUCfKH5fzfiYSjxAAAkkMaxvov9BF5_5d0Jl4QUkBAAMCAANtAAM6BA",
+            "file_unique_id": "AQADSQxrG-i_0EVy",
+            "file_size": 38229,
+            "width": 240,
+            "height": 320
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANfabn4MeGi412jUCfKH5fzfiYSjxAAAkkMaxvov9BF5_5d0Jl4QUkBAAMCAAN4AAM6BA",
+            "file_unique_id": "AQADSQxrG-i_0EV9",
+            "file_size": 234658,
+            "width": 600,
+            "height": 800
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANfabn4MeGi412jUCfKH5fzfiYSjxAAAkkMaxvov9BF5_5d0Jl4QUkBAAMCAAN5AAM6BA",
+            "file_unique_id": "AQADSQxrG-i_0EV-",
+            "file_size": 352497,
+            "width": 960,
+            "height": 1280
+          }
+        ],
+        "caption": "Oriental rug saddle bag. Each side is 25\" x 20 1/2\". There are pockets on each side"
+      }
+    },
+    {
+      "update_id": 819507784,
+      "message": {
+        "message_id": 96,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795377,
+        "media_group_id": "14190363016840657",
+        "photo": [
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANgabn4MXLEZhLkxe0W916D-GMSR3AAAkoMaxvov9BF4TLqROkbB-oBAAMCAANzAAM6BA",
+            "file_unique_id": "AQADSgxrG-i_0EV4",
+            "file_size": 1456,
+            "width": 67,
+            "height": 90
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANgabn4MXLEZhLkxe0W916D-GMSR3AAAkoMaxvov9BF4TLqROkbB-oBAAMCAANtAAM6BA",
+            "file_unique_id": "AQADSgxrG-i_0EVy",
+            "file_size": 30576,
+            "width": 240,
+            "height": 320
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANgabn4MXLEZhLkxe0W916D-GMSR3AAAkoMaxvov9BF4TLqROkbB-oBAAMCAAN4AAM6BA",
+            "file_unique_id": "AQADSgxrG-i_0EV9",
+            "file_size": 196618,
+            "width": 600,
+            "height": 800
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANgabn4MXLEZhLkxe0W916D-GMSR3AAAkoMaxvov9BF4TLqROkbB-oBAAMCAAN5AAM6BA",
+            "file_unique_id": "AQADSgxrG-i_0EV-",
+            "file_size": 303050,
+            "width": 960,
+            "height": 1280
+          }
+        ]
+      }
+    },
+    {
+      "update_id": 819507785,
+      "message": {
+        "message_id": 98,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795421,
+        "media_group_id": "14190363371945249",
+        "photo": [
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANiabn4XeGQ5DkntYEq62k4Y2AkxY0AAksMaxvov9BF1amXnXSCVeYBAAMCAANzAAM6BA",
+            "file_unique_id": "AQADSwxrG-i_0EV4",
+            "file_size": 1636,
+            "width": 67,
+            "height": 90
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANiabn4XeGQ5DkntYEq62k4Y2AkxY0AAksMaxvov9BF1amXnXSCVeYBAAMCAANtAAM6BA",
+            "file_unique_id": "AQADSwxrG-i_0EVy",
+            "file_size": 37948,
+            "width": 240,
+            "height": 320
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANiabn4XeGQ5DkntYEq62k4Y2AkxY0AAksMaxvov9BF1amXnXSCVeYBAAMCAAN4AAM6BA",
+            "file_unique_id": "AQADSwxrG-i_0EV9",
+            "file_size": 223742,
+            "width": 600,
+            "height": 800
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANiabn4XeGQ5DkntYEq62k4Y2AkxY0AAksMaxvov9BF1amXnXSCVeYBAAMCAAN5AAM6BA",
+            "file_unique_id": "AQADSwxrG-i_0EV-",
+            "file_size": 331652,
+            "width": 960,
+            "height": 1280
+          }
+        ],
+        "caption": "Oriental rug 17\" x 24\""
+      }
+    },
+    {
+      "update_id": 819507786,
+      "message": {
+        "message_id": 99,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795421,
+        "media_group_id": "14190363371945249",
+        "photo": [
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANjabn4XTMrYt3tKsNSYNPRLhHH_PsAAkwMaxvov9BFcDa61MzhffIBAAMCAANzAAM6BA",
+            "file_unique_id": "AQADTAxrG-i_0EV4",
+            "file_size": 1608,
+            "width": 67,
+            "height": 90
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANjabn4XTMrYt3tKsNSYNPRLhHH_PsAAkwMaxvov9BFcDa61MzhffIBAAMCAANtAAM6BA",
+            "file_unique_id": "AQADTAxrG-i_0EVy",
+            "file_size": 38025,
+            "width": 240,
+            "height": 320
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANjabn4XTMrYt3tKsNSYNPRLhHH_PsAAkwMaxvov9BFcDa61MzhffIBAAMCAAN4AAM6BA",
+            "file_unique_id": "AQADTAxrG-i_0EV9",
+            "file_size": 221636,
+            "width": 600,
+            "height": 800
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANjabn4XTMrYt3tKsNSYNPRLhHH_PsAAkwMaxvov9BFcDa61MzhffIBAAMCAAN5AAM6BA",
+            "file_unique_id": "AQADTAxrG-i_0EV-",
+            "file_size": 324746,
+            "width": 960,
+            "height": 1280
+          }
+        ]
+      }
+    },
+    {
+      "update_id": 819507787,
+      "message": {
+        "message_id": 101,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795454,
+        "media_group_id": "14190363636284793",
+        "photo": [
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANlabn4fhqZrqzQaE3--RsV6dMnin0AAk0Maxvov9BFshXZY1y_8yYBAAMCAANzAAM6BA",
+            "file_unique_id": "AQADTQxrG-i_0EV4",
+            "file_size": 2010,
+            "width": 67,
+            "height": 90
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANlabn4fhqZrqzQaE3--RsV6dMnin0AAk0Maxvov9BFshXZY1y_8yYBAAMCAANtAAM6BA",
+            "file_unique_id": "AQADTQxrG-i_0EVy",
+            "file_size": 42479,
+            "width": 240,
+            "height": 320
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANlabn4fhqZrqzQaE3--RsV6dMnin0AAk0Maxvov9BFshXZY1y_8yYBAAMCAAN4AAM6BA",
+            "file_unique_id": "AQADTQxrG-i_0EV9",
+            "file_size": 234173,
+            "width": 600,
+            "height": 800
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANlabn4fhqZrqzQaE3--RsV6dMnin0AAk0Maxvov9BFshXZY1y_8yYBAAMCAAN5AAM6BA",
+            "file_unique_id": "AQADTQxrG-i_0EV-",
+            "file_size": 340341,
+            "width": 960,
+            "height": 1280
+          }
+        ],
+        "caption": "Oriental rug. Measure 18\" x 24\""
+      }
+    },
+    {
+      "update_id": 819507788,
+      "message": {
+        "message_id": 102,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795454,
+        "media_group_id": "14190363636284793",
+        "photo": [
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANmabn4fiSDPUDGHNW3FQcVm6i92xwAAk4Maxvov9BFEwLam6YROvwBAAMCAANzAAM6BA",
+            "file_unique_id": "AQADTgxrG-i_0EV4",
+            "file_size": 1913,
+            "width": 67,
+            "height": 90
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANmabn4fiSDPUDGHNW3FQcVm6i92xwAAk4Maxvov9BFEwLam6YROvwBAAMCAANtAAM6BA",
+            "file_unique_id": "AQADTgxrG-i_0EVy",
+            "file_size": 40199,
+            "width": 240,
+            "height": 320
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANmabn4fiSDPUDGHNW3FQcVm6i92xwAAk4Maxvov9BFEwLam6YROvwBAAMCAAN4AAM6BA",
+            "file_unique_id": "AQADTgxrG-i_0EV9",
+            "file_size": 219269,
+            "width": 600,
+            "height": 800
+          },
+          {
+            "file_id": "AgACAgEAAyEFAATh4cuFAANmabn4fiSDPUDGHNW3FQcVm6i92xwAAk4Maxvov9BFEwLam6YROvwBAAMCAAN5AAM6BA",
+            "file_unique_id": "AQADTgxrG-i_0EV-",
+            "file_size": 321317,
+            "width": 960,
+            "height": 1280
+          }
+        ]
+      }
+    },
+    {
+      "update_id": 819507789,
+      "message": {
+        "message_id": 104,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795489,
+        "text": "Make sure that when all of these get listed, they are marked as local pickup instead of shipped"
+      }
+    },
+    {
+      "update_id": 819507790,
+      "message": {
+        "message_id": 106,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795531,
+        "text": "The items I am talking about are all the items we sell from now on. They should all be local pickup by default."
+      }
+    },
+    {
+      "update_id": 819507791,
+      "message": {
+        "message_id": 108,
+        "from": {
+          "id": 8584834172,
+          "is_bot": false,
+          "first_name": "David",
+          "last_name": "Morgan",
+          "language_code": "en"
+        },
+        "chat": {
+          "id": -1003789671301,
+          "title": "Resell-Bot",
+          "type": "supergroup"
+        },
+        "date": 1773795600,
+        "text": "Go"
+      }
+    }
+  ]
+}

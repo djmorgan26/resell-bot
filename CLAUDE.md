@@ -58,12 +58,17 @@ resell-bot/
 │   ├── create-listing/SKILL.md        ← new listing creation (photos → published)
 │   ├── followup/SKILL.md              ← act on user's Telegram replies
 │   ├── send-summary/SKILL.md          ← format + send Telegram summary
+│   ├── instant-list/SKILL.md          ← real-time Telegram → Claude listing trigger
 │   └── scheduled-runs/
 │       ├── morning-run.md             ← orchestration: photo inbox + listing check
 │       └── followup-run.md            ← orchestration: process user's replies
 ├── scripts/
 │   ├── update_inventory.py            ← CLI tool for the spreadsheet
-│   └── convert_heic.py               ← converts iPhone HEIC photos → JPEG
+│   ├── convert_heic.py               ← converts iPhone HEIC photos → JPEG
+│   ├── telegram_poll_bot.py           ← background Telegram watcher (instant research)
+│   ├── install-listener.sh           ← installs poll bot as macOS service
+│   └── com.resellbot.telegram-poll-bot.plist ← launchd config
+├── logs/                              ← listener + Claude session logs (gitignored)
 ├── notifications/                     ← Telegram API + Python modules
 │   ├── .env                           ← Telegram credentials (gitignored)
 │   ├── .env.example                   ← template
@@ -93,6 +98,7 @@ resell-bot/
 | `skills/create-listing/SKILL.md` | Create a new listing — photos, pricing research, description, posting | Read and follow the SKILL.md |
 | `skills/followup/SKILL.md` | Act on the user's Telegram replies to pending decisions | Read and follow the SKILL.md |
 | `skills/send-summary/SKILL.md` | Format and send the post-run Telegram summary | Read and follow the SKILL.md |
+| `skills/instant-list/SKILL.md` | Real-time: Telegram photo → research + document in inventory | Runs via `scripts/telegram_poll_bot.py` |
 
 ### Scheduled runs
 
@@ -229,6 +235,17 @@ Routine actions that are fine autonomously:
 - Answer "is this still available?" messages
 - Reply to questions covered by the listing (dimensions, condition, shipping)
 - Update `resell_inventory.xlsx`
+
+---
+
+## Pricing strategy
+
+**Default to Market Price** when creating a new listing. The strategy is:
+1. List at the **Market Price** tier (median of comparable sold listings)
+2. If no interest after 1-2 weeks, lower toward the **Quick Sale** tier
+3. Never go below the Quick Sale price — that's the floor
+
+This means `selling.priority` in `config.yaml` sets the *starting* strategy, but the general rule is: start at market, lower if needed. Never race to the bottom on day one.
 
 ---
 

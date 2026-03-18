@@ -44,6 +44,21 @@ If none found, continue normally.
 
 ---
 
+## Step 4b — Publish any items marked "ready"
+
+Read `[WORKSPACE]/resell_inventory.xlsx` and check for rows where Status = "ready". These are items that the poll bot has fully researched and documented but not yet posted.
+
+For each "ready" item:
+1. Find its photos in `[WORKSPACE]/items/<item-folder>/`
+2. Read and follow `[WORKSPACE]/skills/create-listing/SKILL.md` Stage 6 ONLY (Publish)
+3. Use Chrome browser tools to post the listing on the target marketplace(s)
+4. After publishing, update the inventory: set status to "listed", add the listing URL
+5. Note the published item in the Telegram summary
+
+If Chrome is unavailable, skip publishing and note it in the summary.
+
+---
+
 ## Step 5 — Read the inventory
 
 ```bash

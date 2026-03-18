@@ -39,6 +39,8 @@ Usage (local/non-sandbox):
     new_items = fetch_and_save_photos("./photo-inbox", hours=48)
 """
 
+from __future__ import annotations
+
 import base64
 import json
 import os

@@ -24,6 +24,8 @@ Usage (local/non-sandbox):
         acknowledge_updates(max(m["update_id"] for m in messages))
 """
 
+from __future__ import annotations
+
 import json
 import os
 from datetime import datetime, timedelta, timezone

@@ -1,11 +1,11 @@
 ---
 name: followup-listings
-description: "Act on David's Telegram replies to pending listing decisions. Use this skill whenever running the follow-up scheduled task — it reads David's recent Telegram messages, matches them to any pending actions from the morning monitoring run, sends the appropriate buyer replies in the browser, resolves handled items, and confirms back to David via Telegram. Trigger when the scheduled follow-up task runs, or when the user says 'check my replies', 'did I respond', 'act on my telegram replies', or 'process pending actions'."
+description: "Act on the user's Telegram replies to pending listing decisions. Use this skill whenever running the follow-up scheduled task — it reads the user's recent Telegram messages, matches them to any pending actions from the morning monitoring run, sends the appropriate buyer replies in the browser, resolves handled items, and confirms back to the user via Telegram. Trigger when the scheduled follow-up task runs, or when the user says 'check my replies', 'did I respond', 'act on my telegram replies', or 'process pending actions'."
 ---
 
 # Follow-Up: Act on Telegram Replies
 
-You are the follow-up half of David's resell bot. The morning monitoring run checks listings and sends David a Telegram summary with numbered reply options for anything needing his decision. This skill picks up where that left off: reads his replies, executes the chosen actions in the browser, and confirms what was done.
+You are the follow-up half of the user's resell bot. The morning monitoring run checks listings and sends the user a Telegram summary with numbered reply options for anything needing theirdecision. This skill picks up where that left off: reads theirreplies, executes the chosen actions in the browser, and confirms what was done.
 
 ## How the Two-Run Flow Works
 
@@ -13,11 +13,11 @@ You are the follow-up half of David's resell bot. The morning monitoring run che
 Morning run  → checks listings, sends Telegram with 🔔 IMPORTANT + numbered options
              → writes notifications/pending_actions.json
 
-David (phone) → replies in Telegram: "Carter 1"
+the user (phone) → replies in Telegram: "Carter 1"
 
-This skill  → reads David's Telegram replies via Chrome JS (EXIT if none)
+This skill  → reads the user's Telegram replies via Chrome JS (EXIT if none)
 (1hr later)  → reads pending_actions.json to find what each reply maps to
-             → if pending is empty but David replied → alert David (don't silently exit)
+             → if pending is empty but the user replied → alert the user (don't silently exit)
              → matches "Carter 1" to the reply text for option 1
              → opens the FB/eBay thread, sends the reply
              → resolves the item from pending_actions.json
@@ -25,7 +25,7 @@ This skill  → reads David's Telegram replies via Chrome JS (EXIT if none)
              → sends Telegram confirmation
 ```
 
-**Critical rule:** Never acknowledge Telegram updates until after the replies have been sent in the browser. If something fails mid-run, David's messages stay in the Telegram queue and will be picked up on the next run.
+**Critical rule:** Never acknowledge Telegram updates until after the replies have been sent in the browser. If something fails mid-run, the user's messages stay in the Telegram queue and will be picked up on the next run.
 
 ---
 
@@ -39,9 +39,9 @@ Store this path as WORKSPACE for all subsequent steps.
 
 ---
 
-## Step 2 — Fetch David's Recent Telegram Replies via Chrome
+## Step 2 — Fetch the user's Recent Telegram Replies via Chrome
 
-**Do this first — before checking pending_actions.json.** David's replies live in the Telegram queue and must be read before anything else. Only acknowledge them (Step 6b) after the browser replies have been sent.
+**Do this first — before checking pending_actions.json.** the user's replies live in the Telegram queue and must be read before anything else. Only acknowledge them (Step 6b) after the browser replies have been sent.
 
 Python can't reach `api.telegram.org` from the Cowork sandbox (proxy blocks it). Use Chrome JS instead.
 
@@ -68,7 +68,7 @@ Python can't reach `api.telegram.org` from the Cowork sandbox (proxy blocks it).
 echo '<JSON_STRING>' > /tmp/tg_updates.json
 ```
 
-**2e.** Parse it with Python to extract David's recent messages:
+**2e.** Parse it with Python to extract the user's recent messages:
 
 ```bash
 source [WORKSPACE]/.venv/bin/activate
@@ -87,7 +87,7 @@ EOF
 
 **Important:** The `chat_id` filter ensures we only read messages from the group chat, not from personal DMs to the bot. This prevents the bot from acting on messages sent in the wrong chat.
 
-If the output is `[]` → **stop here**. David hasn't replied yet. Exit cleanly with no Telegram message.
+If the output is `[]` → **stop here**. the user hasn't replied yet. Exit cleanly with no Telegram message.
 
 Store the parsed list as MESSAGES.
 
@@ -98,14 +98,14 @@ Store the parsed list as MESSAGES.
 Now read `[WORKSPACE]/notifications/pending_actions.json`.
 
 - If `"pending"` has items → proceed to Step 4 (matching).
-- If `"pending"` is **empty but MESSAGES is non-empty** → David replied to something but `pending_actions.json` has no context. **Do not silently exit.** Send David a Telegram message: `"⚠️ Got your reply but no pending actions on file — the morning run may not have completed. Running a fresh check now."` Then trigger the manage-listings skill to re-run.
+- If `"pending"` is **empty but MESSAGES is non-empty** → the user replied to something but `pending_actions.json` has no context. **Do not silently exit.** Send the user a Telegram message: `"⚠️ Got your reply but no pending actions on file — the morning run may not have completed. Running a fresh check now."` Then trigger the manage-listings skill to re-run.
 - If both are empty → exit cleanly with no Telegram message.
 
 ---
 
 ## Step 4 — Match Replies to Pending Actions
 
-David's reply format is: `"Carter 1"`, `"Carter: 2"`, etc. — a key (usually a buyer's first name) plus an option number.
+the user's reply format is: `"Carter 1"`, `"Carter: 2"`, etc. — a key (usually a buyer's first name) plus an option number.
 
 Run this, passing MESSAGES as JSON input:
 
@@ -121,7 +121,7 @@ print(json.dumps(matched, default=str))
 EOF
 ```
 
-If the output is `[]` → David replied but the format didn't match any pending key (e.g. typo). Send David a Telegram message: `"⚠️ Couldn't match your reply to any pending action. Pending keys: [list keys from pending_actions.json]. Reply format: 'Key Number' (e.g. 'Carter 1')."` Then exit.
+If the output is `[]` → the user replied but the format didn't match any pending key (e.g. typo). Send the user a Telegram message: `"⚠️ Couldn't match your reply to any pending action. Pending keys: [list keys from pending_actions.json]. Reply format: 'Key Number' (e.g. 'Carter 1')."` Then exit.
 
 Store the result as MATCHED.
 
@@ -132,7 +132,7 @@ Store the result as MATCHED.
 For each item in MATCHED:
 
 **a.** Check `action["reply_text"]`:
-- If it's `"__HOLD__"` → skip entirely. David chose to wait on this one.
+- If it's `"__HOLD__"` → skip entirely. the user chose to wait on this one.
 - Otherwise → proceed to send the reply.
 
 **b.** Navigate Chrome to `action["thread_url"]`:
@@ -169,7 +169,7 @@ if resolved_keys:
 EOF
 ```
 
-**6b.** Acknowledge Telegram updates via Chrome JS — **only after browser replies are confirmed sent** (screenshots taken in Step 5). This removes David's messages from the Telegram queue so they don't reappear. If Step 5 failed for any item, do NOT acknowledge — the failed item needs to stay in the queue for the next run. Get the highest `update_id` from MESSAGES, then run:
+**6b.** Acknowledge Telegram updates via Chrome JS — **only after browser replies are confirmed sent** (screenshots taken in Step 5). This removes the user's messages from the Telegram queue so they don't reappear. If Step 5 failed for any item, do NOT acknowledge — the failed item needs to stay in the queue for the next run. Get the highest `update_id` from MESSAGES, then run:
 
 ```javascript
 (async () => {
@@ -225,21 +225,21 @@ Rules:
 
 These rules carry over from the main listing skill:
 
-- Never accept or decline an offer on David's behalf — if an action in `pending_actions.json` looks like an offer acceptance, flag it and ask David directly.
+- Never accept or decline an offer on the user's behalf — if an action in `pending_actions.json` looks like an offer acceptance, flag it and ask the user directly.
 - Never change a listing price.
-- Never share David's personal info (phone, address) in any reply.
+- Never share the user's personal info (phone, address) in any reply.
 - Never make pickup/meeting commitments.
-- Never send a message that wasn't explicitly pre-approved by David via his numbered reply.
+- Never send a message that wasn't explicitly pre-approved by the user via theirnumbered reply.
 
 ---
 
 ## Troubleshooting
 
-**Bot can't see David's messages in the group chat:** The bot's Privacy Mode must be OFF. Check with the `getMe` API — `can_read_all_group_messages` must be `true`. If it's `false`, go to @BotFather → `/mybots` → select the bot → Bot Settings → Group Privacy → Turn off. **The bot must also be removed and re-added to the group after changing this setting** for it to take effect.
+**Bot can't see the user's messages in the group chat:** The bot's Privacy Mode must be OFF. Check with the `getMe` API — `can_read_all_group_messages` must be `true`. If it's `false`, go to @BotFather → `/mybots` → select the bot → Bot Settings → Group Privacy → Turn off. **The bot must also be removed and re-added to the group after changing this setting** for it to take effect.
 
 **Chrome JS fetch returns an error / non-ok Telegram response:** Check that the token in `.env` is still valid. Telegram bot tokens occasionally get regenerated.
 
-**`match_replies()` returns empty even though David replied:** The key in his reply must match the `"key"` field in `pending_actions.json` (case-insensitive, single word). If David typed "carter1" instead of "carter 1", it won't match — the format must be `"Word Number"`.
+**`match_replies()` returns empty even though the user replied:** The key in theirreply must match the `"key"` field in `pending_actions.json` (case-insensitive, single word). If the user typed "carter1" instead of "carter 1", it won't match — the format must be `"Word Number"`.
 
 **Browser can't find the message box on FB/eBay:** Take a screenshot first to see the current state of the page. Log in if the session has expired.
 

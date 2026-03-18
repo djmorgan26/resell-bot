@@ -97,7 +97,7 @@ Based on the market data gathered:
 | **Auction house (specialist)** | $5,000–$15,000 | Best for truly exceptional pieces; 15–25% seller commission |
 | **Private sale to collector** | $8,000–$18,000 | Best outcome but hardest to find buyer |
 
-**Bottom line estimate for quick sale (David's priority):** List at **$6,000–$8,000** locally (FB Marketplace / Craigslist), which positions it to sell within weeks. If willing to wait and ship, list at **$9,000–$12,000** on eBay or Chairish.
+**Bottom line estimate for quick sale (the user's priority):** List at **$6,000–$8,000** locally (FB Marketplace / Craigslist), which positions it to sell within weeks. If willing to wait and ship, list at **$9,000–$12,000** on eBay or Chairish.
 
 ---
 

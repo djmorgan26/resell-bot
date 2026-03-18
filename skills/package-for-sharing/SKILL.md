@@ -31,7 +31,7 @@ Scan the project for anything that belongs to you specifically.
 - Hardcoded URLs pointing to your personal accounts (eBay seller page, FB profile, etc.)
 
 **In documentation:**
-- Your name used as if it's everyone's name (e.g. "David sends photos" instead of "the user sends photos")
+- Your name used as if it's everyone's name (e.g. "the user sends photos" instead of "the user sends photos")
 - References to your specific accounts or setup
 - "For me" language instead of "for you" language
 
@@ -174,7 +174,7 @@ Update all docs to use generic "you/the user" language instead of your name.
 Go through each doc file and:
 - Replace your name with "the user" (in skill/technical docs) or "you" (in README/user-facing docs)
 - Replace your account IDs with "your [account type]" or a config reference like `config.yaml → selling.ebay_username`
-- Change "For me" / "For David" framing to "For you" framing
+- Change "For me" / "For the user" framing to "For you" framing
 - Change "I want" to "You might want"
 
 ### README.md rewrite checklist

@@ -132,7 +132,8 @@ def update_item(xlsx_path, name, **kwargs):
     ws = wb['Inventory']
 
     col_map = {
-        'status': 12, 'listed_price': 9, 'sold_price': 10,
+        'status': 12, 'price_low': 6, 'price_mid': 7, 'price_high': 8,
+        'listed_price': 9, 'sold_price': 10,
         'marketplace': 11, 'date_listed': 14, 'date_sold': 15,
         'listing_url': 16, 'notes': 18
     }
@@ -230,6 +231,9 @@ if __name__ == '__main__':
     upd_p = subparsers.add_parser('update')
     upd_p.add_argument('--name', required=True)
     upd_p.add_argument('--status')
+    upd_p.add_argument('--price-low', type=float, dest='price_low')
+    upd_p.add_argument('--price-mid', type=float, dest='price_mid')
+    upd_p.add_argument('--price-high', type=float, dest='price_high')
     upd_p.add_argument('--listed-price', type=float, dest='listed_price')
     upd_p.add_argument('--sold-price', type=float, dest='sold_price')
     upd_p.add_argument('--marketplace')

@@ -73,9 +73,9 @@ Urgent items include:
 - A sale that completed (needs shipping)
 - An offer received (needs accept/decline decision)
 - A buyer question you couldn't answer from the listing
-- Anything else where David must act before you can proceed
+- Anything else where the user must act before you can proceed
 
-**Format — use numbered reply options so David can respond from Telegram on his phone:**
+**Format — use numbered reply options so the user can respond from Telegram on their phone:**
 
 ```
 🔔 IMPORTANT — reply needed:
@@ -99,7 +99,7 @@ Reply:
 **Option guidelines:**
 - Option 1 is always the recommended default (add ✓)
 - Always include a "hold — decide later" as the last option
-- For SOLD items, no reply options needed — just state what sold and what David needs to do (ship by when, etc.)
+- For SOLD items, no reply options needed — just state what sold and what the user needs to do (ship by when, etc.)
 
 **Example — buyer question:**
 ```
@@ -237,10 +237,10 @@ print('pending_actions.json cleared')
 Morning run   →  sends Telegram with 🔔 IMPORTANT + numbered reply options
               →  writes pending_actions.json
 
-David (phone) →  replies in Telegram: "Carter 1"
+the user (phone) →  replies in Telegram: "Carter 1"
 
 Follow-up run →  reads pending_actions.json (if empty: exits quietly)
-(1hr later)   →  reads Telegram for David's recent messages (if none: exits quietly)
+(1hr later)   →  reads Telegram for the user's recent messages (if none: exits quietly)
               →  matches "Carter 1" → reply text for option 1
               →  opens Chrome, navigates to FB thread, sends the reply
               →  resolves Carter from pending_actions.json

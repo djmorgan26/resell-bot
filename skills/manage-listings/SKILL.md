@@ -122,13 +122,13 @@ If a listing has been active for more than 7 days with low views/watchers:
 All notifications go via Telegram. Gmail MCP is read-only and cannot send messages.
 
 Every run ends with a Telegram summary — follow `[WORKSPACE]/skills/send-summary/SKILL.md` for the exact format. That skill defines:
-- The **IMPORTANT** section: urgent items with **numbered reply options** so David can respond from his phone
+- The **IMPORTANT** section: urgent items with **numbered reply options** so the user can respond from theirphone
 - The **Active Listings table**: current state of all listed items
 - How to write **pending_actions.json** (required after every run — consumed by the follow-up task)
 
 The Telegram message is always sent at the end of every run, regardless of whether anything urgent happened.
 
-**New behavior:** IMPORTANT items must include numbered reply options (e.g. "Carter 1", "Carter 2"). David replies in Telegram from his phone; the follow-up run picks up his reply and executes the action. See `skills/send-summary/SKILL.md` for the exact format.
+**New behavior:** IMPORTANT items must include numbered reply options (e.g. "Carter 1", "Carter 2"). the user replies in Telegram from theirphone; the follow-up run picks up theirreply and executes the action. See `skills/send-summary/SKILL.md` for the exact format.
 
 ## Inventory Tracker Updates
 
@@ -155,7 +155,7 @@ Key columns and how to use them:
 | `Status` | Only check rows where Status = "listed" |
 | `Listing URL` | The URL to open in Chrome for each listing |
 | `Listed Price $` | The current asking price |
-| `Quick Sale $` | The pricing floor — minimum acceptable offer (David prioritizes speed of sale) |
+| `Quick Sale $` | The pricing floor — minimum acceptable offer (the user prioritizes speed of sale) |
 | `Marketplace` | Which platform the listing is on (eBay, FB Marketplace, etc.) |
 | `Item Name` | Use this as the identifier in emails and script commands |
 

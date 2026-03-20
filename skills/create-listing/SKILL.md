@@ -167,6 +167,46 @@ Key Details:
 ### Photos
 Recommend which photos to use and in what order (lead with the best overall shot, then details, then any flaws).
 
+## Item Folder Naming Convention
+
+When saving photos to `items/` (or `photo-inbox/` before the listing is created), use this naming pattern:
+
+```
+[item-type]-[key-descriptor]-[size-or-id]
+```
+
+**Rules:**
+- All lowercase, words separated by hyphens
+- Max ~30 characters total — short enough to read at a glance
+- Lead with the **item type** (rug, bag, vase, table, chair, lamp, etc.)
+- Add 1-2 **key descriptors** that distinguish it (brand, style, origin, material)
+- End with **dimensions or a unique ID** if it helps distinguish similar items
+
+**Good examples:**
+```
+oriental-khorjin-saddle-bag-25x20    ← type: bag, descriptor: khorjin, size: 25x20
+baluchi-flat-bag-27x29               ← type: bag, descriptor: baluchi flat, size
+persian-pile-rug-medallion-29x35     ← type: rug, descriptor: persian pile medallion, size
+ahmady-persian-rug-29x37             ← type: rug, descriptor: brand + origin, size
+turkish-kilim-28x44                  ← type: rug, descriptor: kilim style, size
+mashad-persian-rug-11x16             ← type: rug, descriptor: city + origin, size
+chinese-flambe-glaze-vase-27in       ← type: vase, descriptor: style + glaze, height
+stone-top-coffee-table-set           ← type: table, descriptor: material + form
+paradigm-monitor-9-speakers          ← type: speakers, descriptor: brand + model
+```
+
+**Bad examples (avoid):**
+```
+oriental-rug-saddle-bag-each-side-is-25-x-20-12-there-are-po   ← too long, truncated
+oriental-bag-27-x-29                                             ← "oriental" is too vague
+oriental-37-12-x-56-12                                          ← no item type or descriptor
+rug-30-12-x-57                                                   ← no descriptor at all
+```
+
+**When in doubt:** ask yourself "if I saw this folder name a month from now, would I know which item it is?" If yes, it's good.
+
+---
+
 ## Stage 6: Publish
 
 If the item should go on multiple marketplaces (see Stage 5 guidance), publish to **each one**. Create separate inventory entries or update the same entry with multiple listing URLs.

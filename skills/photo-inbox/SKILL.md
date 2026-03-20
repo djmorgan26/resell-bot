@@ -219,14 +219,31 @@ Your workflow is just:
 ```
 photo-inbox/
 ├── processed.json              ← tracks which photos have been downloaded
-├── vintage-desk-lamp/          ← one folder per item (from caption)
+├── persian-pile-rug-29x35/     ← one folder per item — see naming convention below
 │   ├── photo-1.jpg
 │   ├── photo-2.jpg
 │   └── photo-3.jpg
-├── kitchenaid-mixer/
+├── baluchi-flat-bag-27x29/
 │   ├── photo-1.jpg
 │   └── photo-2.jpg
 └── .gitkeep
 ```
 
 Photos stay in `photo-inbox/` until the listing is created, then get moved to `items/<item-name>/`.
+
+## Folder Naming Convention
+
+Use the same naming pattern as `items/` — short, human-readable, no truncation:
+
+```
+[item-type]-[key-descriptor]-[size-or-id]
+```
+
+- All lowercase, hyphens between words, max ~30 characters
+- Lead with item type, add 1-2 descriptors, end with dimensions or a unique ID
+- The Telegram caption is the **starting point** — condense it into this format, don't use it verbatim
+
+For example, if the caption is "Oriental Khorjin Saddle Bag Tribal Handwoven Wool Pair 25 x 20.5":
+→ folder name: `oriental-khorjin-saddle-bag-25x20`
+
+See `skills/create-listing/SKILL.md` → "Item Folder Naming Convention" for full examples and rules.

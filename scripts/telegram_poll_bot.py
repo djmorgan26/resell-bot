@@ -197,11 +197,67 @@ class PendingSession:
 
     @property
     def folder_name(self) -> str:
+        """Convert caption to a short, human-readable folder name.
+
+        Convention: [item-type]-[key-descriptor]-[size-or-id]
+        - All lowercase, hyphens between words, max ~35 characters
+        - Strip filler words that add no meaning
+        - Normalize dimensions (e.g. "27 x 29" → "27x29", "27.5 in" → "27in")
+
+        Examples:
+          "Oriental Khorjin Saddle Bag Tribal Handwoven Wool Pair 25 x 20.5"
+          → "oriental-khorjin-saddle-bag-25x20"
+
+          "Handwoven Striped Flatweave Rug Runner Brown Cream 30.5 x 57"
+          → "handwoven-striped-rug-30x57"
+        """
         import re
         name = self.caption.lower().strip()
-        name = re.sub(r"[^\w\s-]", "", name)
-        name = re.sub(r"\s+", "-", name)
-        return (name[:60] or "unnamed-item")
+
+        # Normalize dimensions: "27.5 x 56.5" → "27x56", "30.5in" → "30in"
+        # Pattern: number (optional decimal) x number  OR  number (optional decimal) in/inch
+        name = re.sub(r"(\d+)\.5\s*x\s*(\d+)\.5", r"\1x\2", name)   # 27.5 x 56.5 → 27x56
+        name = re.sub(r"(\d+)\.5\s*x\s*(\d+)", r"\1x\2", name)       # 27.5 x 56 → 27x56
+        name = re.sub(r"(\d+)\s*x\s*(\d+)\.5", r"\1x\2", name)       # 27 x 56.5 → 27x56
+        name = re.sub(r"(\d+)\s*x\s*(\d+)", r"\1x\2", name)           # 27 x 56 → 27x56
+        name = re.sub(r"(\d+)\.5\s*(in|inch|\")", r"\1in", name)      # 27.5in → 27in
+        name = re.sub(r"(\d+)\s*(in|inch|\")", r"\1in", name)          # 27 in → 27in
+        name = re.sub(r"(\d+)\.5\s*(ft|feet|')", r"\1ft", name)       # 11.5ft → 11ft
+
+        # Remove filler words that add no meaning to a folder name
+        fillers = [
+            r"\beach\b", r"\bside\b", r"\bthere\bare\b", r"\bphotos?\b",
+            r"\bhandwoven\b", r"\bhandmade\b", r"\bhand[-\s]?knotted\b",
+            r"\bhand[-\s]?woven\b", r"\btribal\b", r"\bwool\b", r"\bpair\b",
+            r"\bvintage\b", r"\bfloral\b(?!\s+mat)", r"\bgeometric\b",
+            r"\bflatweave\b", r"\brunner\b", r"\bpile\b(?!\s+rug)",
+            r"\bdesign\b", r"\bpattern\b", r"\bdecorative\b",
+            r"\bbeautiful\b", r"\bnice\b", r"\bgreat\b", r"\bexcellent\b",
+            r"\bcondition\b", r"\bitem\b", r"\blisting\b",
+            r"\bthe\b", r"\band\b", r"\bwith\b", r"\bfor\b", r"\bof\b",
+        ]
+        for filler in fillers:
+            name = re.sub(filler, " ", name)
+
+        # Strip non-alphanumeric chars except hyphens and spaces
+        name = re.sub(r"[^\w\s\-]", "", name)
+        # Collapse whitespace and replace with hyphens
+        name = re.sub(r"[\s_]+", "-", name.strip())
+        # Collapse multiple hyphens
+        name = re.sub(r"-+", "-", name)
+        # Strip leading/trailing hyphens
+        name = name.strip("-")
+
+        # Trim to max 35 chars, breaking only at a hyphen
+        if len(name) > 35:
+            trimmed = name[:35]
+            last_hyphen = trimmed.rfind("-")
+            if last_hyphen > 15:  # only break at hyphen if we keep a reasonable chunk
+                name = trimmed[:last_hyphen]
+            else:
+                name = trimmed
+
+        return name or "unnamed-item"
 
     def add_photo(self, photo_info: dict) -> None:
         self.photos.append(photo_info)

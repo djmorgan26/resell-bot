@@ -15,11 +15,13 @@ You are monitoring the user's active marketplace listings and handling routine i
    - Stale listing threshold (how many days before flagging?)
    - If any **REQUIRED** preferences are missing, stop and ask the user before proceeding.
 
-2. **Read `resell_inventory.xlsx`** as the source of truth for:
+2. **Read `resell_inventory.xlsx`** as the starting point for:
    - Which items are currently `listed`
    - Listing prices and Quick Sale floors
    - Marketplace platform for each item
    - Listing URLs
+
+   **Note:** The spreadsheet may be out of date — the user sometimes updates listings directly on eBay or Facebook Marketplace (changing price, marking sold, ending a listing) without going through Claude. Always treat the **live marketplace** as the ultimate source of truth when there's a conflict. See "Syncing Marketplace Reality to Inventory" below.
 
 ## Core Principles
 
@@ -157,12 +159,38 @@ Present all findings directly to the user in conversation, organized by priority
 4. **Stale listings** (if any):
    - Items to consider refreshing or repricing
 
+## Syncing Marketplace Reality to Inventory
+
+**The user may update listings directly on eBay or Facebook Marketplace without going through Claude.** This means the spreadsheet can be stale. During every listing check, compare what you see on the marketplace against what the spreadsheet says, and fix any discrepancies.
+
+### What to look for
+
+| Marketplace shows | Spreadsheet says | Action |
+|---|---|---|
+| Item sold | Status = "listed" | Update to "sold", record sold price and date, flag to user |
+| Listing ended/expired | Status = "listed" | Update to "expired", note in findings |
+| Price changed | Different `Listed Price $` | Update the spreadsheet price to match marketplace |
+| Listing not found / removed | Status = "listed" | Update to "expired" or "removed", ask user what happened |
+| New listing not in spreadsheet | No row exists | Add a new row with what you can see (name, price, URL, marketplace), flag to user for confirmation |
+| Item marked sold in spreadsheet | Still active on marketplace | Note the conflict — ask the user which is correct |
+
+### How to handle conflicts
+
+1. **Always trust the marketplace over the spreadsheet** for current status — if eBay says it sold, it sold.
+2. **Always trust the spreadsheet for pricing floors** — Quick Sale $ and Market Price $ don't change just because the user adjusted the listing price on the marketplace.
+3. After syncing, note what changed in your findings presentation so the user knows the spreadsheet was updated.
+4. Log any sync corrections as issue type `"inventory"` so patterns can be reviewed.
+
+---
+
 ## Inventory Tracker Updates
 
 After every check, update the inventory spreadsheet at `[workspace]/resell_inventory.xlsx`:
 
+- Sync any marketplace changes back to the spreadsheet (see above)
 - Mark sold items as "sold" with the sold price and date
 - Update listing URLs if they've changed
+- Update listed prices if the user changed them on the marketplace
 - Add notes about offers, messages, or engagement levels
 - Update the "last checked" date
 
@@ -173,16 +201,16 @@ python3 [WORKSPACE]/scripts/update_inventory.py <xlsx_path> update --name "Item 
 
 ## Reading the Inventory
 
-The inventory spreadsheet (`resell_inventory.xlsx`) is the source of truth for all listing data. Do not rely on hardcoded listing details anywhere — always read the file.
+The inventory spreadsheet (`resell_inventory.xlsx`) is the starting reference for listing data — but the live marketplace is the ultimate source of truth for current status and price. Always read the spreadsheet first, then verify against what you see in Chrome.
 
 Key columns and how to use them:
 
 | Column | Use |
 |--------|-----|
-| `Status` | Only check rows where Status = "listed" |
+| `Status` | Start by checking rows where Status = "listed" — but verify each is still active on the marketplace |
 | `Listing URL` | The URL to open in Chrome for each listing |
-| `Listed Price $` | The current asking price |
-| `Quick Sale $` | The pricing floor — minimum acceptable offer (the user prioritizes speed of sale) |
+| `Listed Price $` | The price we expect — compare against what the marketplace actually shows |
+| `Quick Sale $` | The pricing floor — minimum acceptable offer. This does NOT change when the user adjusts the marketplace price. |
 | `Marketplace` | Which platform the listing is on (eBay, FB Marketplace, etc.) |
 | `Item Name` | Use this as the identifier in emails and script commands |
 

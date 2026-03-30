@@ -199,7 +199,9 @@ Check `user-preferences.yaml → pricing` for the user's specific settings.
 
 ## Active listings and pricing floors
 
-All listing data lives in `resell_inventory.xlsx` — that is the source of truth. Read it at the start of every run.
+`resell_inventory.xlsx` is the starting reference for all listing data — read it at the start of every run.
+
+**However, the live marketplace is the ultimate source of truth for current status and price.** The user may update listings directly on eBay or Facebook Marketplace (changing price, marking sold, ending a listing) without going through Claude. When checking listings, always compare what the marketplace shows against the spreadsheet and sync any differences back. See `skills/manage-listings/SKILL.md` → "Syncing Marketplace Reality to Inventory" for the full reconciliation process.
 
 The eBay seller username is in `config.yaml` under `selling.ebay_username`.
 

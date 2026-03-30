@@ -3,18 +3,16 @@
 resell-bot setup wizard
 -----------------------
 Run this once to configure resell-bot for your machine.
-It will walk you through creating your config.yaml and notifications/.env,
+It will walk you through creating config.yaml and user-preferences.yaml,
 then verify everything is working.
 
 Usage:
     python3 setup.py
 """
 
-import json
 import os
 import shutil
 import sys
-import time
 from pathlib import Path
 
 # ── helpers ──────────────────────────────────────────────────────────────────
@@ -101,7 +99,6 @@ def check_venv() -> None:
 def check_dependencies() -> None:
     try:
         import yaml  # noqa: F401
-        import dotenv  # noqa: F401
         import openpyxl  # noqa: F401
         ok("Python dependencies installed")
     except ImportError as e:
@@ -114,7 +111,7 @@ def check_dependencies() -> None:
 
 def step_user_info() -> dict:
     heading("Step 1 — About you")
-    print("  This helps personalize notifications and skill behavior.\n")
+    print("  This helps personalize skill behavior and listings.\n")
 
     name = ask("Your first name")
     while not name:
@@ -153,75 +150,62 @@ def step_write_config(config: dict) -> None:
     config_path = REPO_ROOT / "config.yaml"
     with open(config_path, "w") as f:
         f.write("# resell-bot configuration\n")
-        f.write("# This file is gitignored — it contains your personal settings.\n\n")
+        f.write("# This file is gitignored — it contains your personal settings.\n")
+        f.write("# See user-preferences.yaml for detailed selling preferences.\n\n")
         yaml.dump(config, f, default_flow_style=False, allow_unicode=True)
 
     ok(f"config.yaml written to {config_path}")
 
 
-def step_telegram() -> tuple[str, str]:
-    heading("Step 3 — Telegram bot setup")
-    print("""
-  resell-bot sends you notifications and reads your replies via a Telegram bot.
-  You need to create a bot and get two pieces of info: a token and your chat ID.
+def step_preferences(config: dict) -> None:
+    heading("Step 3 — Setting up user-preferences.yaml")
+    prefs_path = REPO_ROOT / "user-preferences.yaml"
+    template_path = REPO_ROOT / "user-preferences.yaml.template"
 
-  ┌─────────────────────────────────────────────────────────┐
-  │  Part A — Create your Telegram bot (takes ~2 minutes)   │
-  └─────────────────────────────────────────────────────────┘
-  1. Open Telegram on your phone or computer
-  2. Search for @BotFather and start a chat
-  3. Send:  /newbot
-  4. Follow the prompts — pick a name and username for your bot
-     (the username must end in "bot", e.g. "myresellbot")
-  5. BotFather will give you a token that looks like:
-        1234567890:ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijk
-  6. Copy that token.
-""")
-    pause("Press Enter once you have your bot token...")
+    if prefs_path.exists():
+        ok("user-preferences.yaml already exists — leaving it untouched")
+        print("     You can edit it anytime to adjust your selling preferences.")
+        return
 
-    token = ask("Paste your bot token here")
-    while not token or ":" not in token:
-        err("That doesn't look like a bot token (expected format: 123456789:ABCDEF...)")
-        token = ask("Paste your bot token here")
+    if not template_path.exists():
+        err("user-preferences.yaml.template not found — cannot create preferences file")
+        return
 
-    print("""
-  ┌─────────────────────────────────────────────────────────┐
-  │  Part B — Find your Telegram chat ID                    │
-  └─────────────────────────────────────────────────────────┘
-  1. Open Telegram and search for the bot you just created
-  2. Send it any message (e.g. "hello")
-  3. Then open this URL in your browser — replace TOKEN with your token:
+    # Copy the template
+    content = template_path.read_text()
 
-        https://api.telegram.org/bot<YOUR_TOKEN>/getUpdates
+    # Fill in required fields from config answers
+    name = config.get("user", {}).get("name", "")
+    ebay_username = config.get("selling", {}).get("ebay_username", "")
+    priority = config.get("selling", {}).get("priority", "speed")
+    marketplaces = config.get("marketplaces", ["ebay", "fb_marketplace"])
 
-  4. Look for "chat":{"id": followed by a number — that's your chat ID.
-     It might be negative (e.g. -100123456789) or positive (e.g. 123456789).
-""")
-    pause("Press Enter once you have your chat ID...")
+    # Replace blank required fields with user's answers
+    content = content.replace('  name: ""', f'  name: "{name}"', 1)
+    content = content.replace('  ebay_username: ""', f'  ebay_username: "{ebay_username}"', 1)
+    content = content.replace('  priority: ""', f'  priority: "{priority}"', 1)
 
-    chat_id = ask("Paste your chat ID here")
-    while not chat_id:
-        err("Chat ID can't be empty.")
-        chat_id = ask("Paste your chat ID here")
+    # Update marketplace list
+    mp_block = "  marketplaces:                         # required: true — which platforms to list on\n"
+    for mp in marketplaces:
+        mp_block += f'    - "{mp}"\n'
 
-    return token, chat_id
+    import re
+    content = re.sub(
+        r'  marketplaces:.*?(?=\n# )',
+        mp_block,
+        content,
+        count=1,
+        flags=re.DOTALL,
+    )
 
-
-def step_write_env(token: str, chat_id: str) -> None:
-    heading("Step 4 — Writing notifications/.env")
-    env_path = REPO_ROOT / "notifications" / ".env"
-    env_content = f"""# Telegram credentials
-# This file is gitignored — never commit it.
-
-TELEGRAM_BOT_TOKEN={token}
-TELEGRAM_CHAT_ID={chat_id}
-"""
-    env_path.write_text(env_content)
-    ok(f"notifications/.env written")
+    prefs_path.write_text(content)
+    ok("user-preferences.yaml created with your settings")
+    print("     You can edit this file anytime to adjust preferences.")
 
 
 def step_inventory() -> None:
-    heading("Step 5 — Setting up inventory spreadsheet")
+    heading("Step 4 — Setting up inventory spreadsheet")
     dest = REPO_ROOT / "resell_inventory.xlsx"
     template = REPO_ROOT / "resell_inventory_template.xlsx"
 
@@ -234,26 +218,18 @@ def step_inventory() -> None:
         return
 
     shutil.copy(template, dest)
-    ok(f"resell_inventory.xlsx created from template")
+    ok("resell_inventory.xlsx created from template")
 
 
-def step_verify(token: str, chat_id: str) -> None:
-    heading("Step 6 — Verifying setup")
-
-    # Check .env
-    env_path = REPO_ROOT / "notifications" / ".env"
-    if env_path.exists():
-        ok("notifications/.env exists")
-    else:
-        err("notifications/.env not found")
-        return
+def step_verify() -> None:
+    heading("Step 5 — Verifying setup")
 
     # Check inventory
     inv = REPO_ROOT / "resell_inventory.xlsx"
     if inv.exists():
         ok("resell_inventory.xlsx exists")
     else:
-        warn("resell_inventory.xlsx not found — run this setup again or create it manually")
+        warn("resell_inventory.xlsx not found — run setup again or create manually")
 
     # Check config
     cfg = REPO_ROOT / "config.yaml"
@@ -262,25 +238,20 @@ def step_verify(token: str, chat_id: str) -> None:
     else:
         warn("config.yaml not found")
 
-    # Send test Telegram message
-    print("\n  Sending a test Telegram message to verify your bot credentials...")
-    try:
-        import urllib.request
+    # Check preferences
+    prefs = REPO_ROOT / "user-preferences.yaml"
+    if prefs.exists():
+        ok("user-preferences.yaml exists")
+    else:
+        warn("user-preferences.yaml not found")
 
-        test_msg = "🤖 resell-bot setup complete! Your bot is connected and ready."
-        url = f"https://api.telegram.org/bot{token}/sendMessage"
-        data = json.dumps({"chat_id": chat_id, "text": test_msg}).encode("utf-8")
-        req = urllib.request.Request(url, data=data, headers={"Content-Type": "application/json"})
-        with urllib.request.urlopen(req, timeout=10) as resp:
-            result = json.loads(resp.read())
-        if result.get("ok"):
-            ok("Test message sent! Check your Telegram — you should see it now.")
-        else:
-            err(f"Telegram returned an error: {result}")
-    except Exception as e:
-        err(f"Couldn't send test message: {e}")
-        print("     Check that your bot token and chat ID are correct.")
-        print("     You can fix them by editing notifications/.env directly.")
+    # Check logs/issues directory
+    issues_dir = REPO_ROOT / "logs" / "issues"
+    if issues_dir.exists():
+        ok("logs/issues/ directory exists")
+    else:
+        issues_dir.mkdir(parents=True, exist_ok=True)
+        ok("logs/issues/ directory created")
 
 
 def step_done(config: dict) -> None:
@@ -297,18 +268,21 @@ def step_done(config: dict) -> None:
 
   2. In Claude (Cowork), open this folder as your workspace.
 
-  3. To run the daily listing check:
-       Read and follow: skills/scheduled-runs/morning-run.md
+  3. To create your first listing:
+       Tell Claude: "I want to list a new item"
+       Or follow: skills/create-listing/SKILL.md
 
-  4. To create your first listing:
-       Read and follow: skills/create-listing/SKILL.md
+  4. To check on your listings:
+       Tell Claude: "Check my listings"
+       Or follow: skills/manage-listings/SKILL.md
 
-  5. To set up the automated daily schedule:
-       Read and follow: skills/setup/SKILL.md
+  5. To organize photos:
+       Tell Claude: "Organize my photos"
+       Or follow: skills/organize-photos/SKILL.md
   ─────────────────────────────────────────────────────────────
 
   Your config lives in config.yaml (gitignored).
-  Your Telegram credentials live in notifications/.env (gitignored).
+  Your preferences live in user-preferences.yaml (gitignored).
   Your inventory lives in resell_inventory.xlsx (gitignored).
 
   None of these files will be accidentally pushed to GitHub.
@@ -324,7 +298,7 @@ def main() -> None:
 ╚════════════════════════════════════════╝{RESET}
 
 This wizard will configure resell-bot for your machine.
-It takes about 5 minutes. You can quit at any time with Ctrl+C.
+It takes about 2 minutes. You can quit at any time with Ctrl+C.
 """)
 
     check_python()
@@ -332,10 +306,9 @@ It takes about 5 minutes. You can quit at any time with Ctrl+C.
 
     config = step_user_info()
     step_write_config(config)
-    token, chat_id = step_telegram()
-    step_write_env(token, chat_id)
+    step_preferences(config)
     step_inventory()
-    step_verify(token, chat_id)
+    step_verify()
     step_done(config)
 
 

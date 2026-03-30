@@ -2,19 +2,22 @@
 
 ## What this project is
 
-An automated reselling assistant. It runs on a daily schedule to monitor eBay and Facebook Marketplace listings, handle routine buyer questions, and notify the user via Telegram when something important happens (sale, real offer, question it can't answer). A separate skill handles creating new listings from scratch. The user can also send photos of new items to the Telegram bot from their phone and listings are created automatically.
+An AI-assisted reselling tool. The user gives Claude photos of items (or points to photos on their machine), and Claude handles everything: identification, market research, pricing, listing creation, and publishing to eBay and/or Facebook Marketplace via Chrome. Claude can also monitor active listings, auto-reply to routine buyer questions, and flag offers/sales for the user's attention.
 
-**Pricing priority** is set in `config.yaml` — check `selling.priority` to know whether to optimize for speed or price.
+All interaction happens in conversation — no scheduled tasks, no Telegram, no background processes.
 
 ---
 
 ## Configuration
 
-Read `config.yaml` at the start of any session. It contains:
+Two config files control behavior:
+
+### config.yaml
+Basic identity and account info. Read at the start of any session.
 
 ```yaml
 user:
-  name: ""              # the user's first name — use this in notifications
+  name: ""              # the user's first name
 selling:
   ebay_username: ""     # their eBay seller username
   priority: "speed"     # "speed" = quick sale, "price" = maximize profit
@@ -22,6 +25,12 @@ marketplaces:
   - "ebay"
   - "fb_marketplace"
 ```
+
+### user-preferences.yaml
+Detailed selling preferences — pricing, shipping, listing style, photo organization, behavioral guardrails, and offer evaluation rules. **Skills must read this file before acting.** Each preference is marked as required or optional:
+
+- **required: true** — Claude MUST have an answer before proceeding. If missing, stop and ask the user.
+- **required: false** — Claude uses the default if the user hasn't set one.
 
 If `config.yaml` does not exist, direct the user to run `python3 setup.py` before doing anything else.
 
@@ -32,7 +41,7 @@ If `config.yaml` does not exist, direct the user to run `python3 setup.py` befor
 Before starting any skill, verify the environment is configured:
 
 1. `config.yaml` exists → read it for user settings
-2. `notifications/.env` exists → Telegram credentials are present
+2. `user-preferences.yaml` exists → read it for selling preferences
 3. `resell_inventory.xlsx` exists → inventory is set up
 
 If any of these are missing, stop and tell the user:
@@ -47,44 +56,23 @@ resell-bot/
 ├── CLAUDE.md                          ← you are here
 ├── config.yaml                        ← user settings (gitignored)
 ├── config.example.yaml                ← template for new users
+├── user-preferences.yaml              ← selling preferences (gitignored)
 ├── setup.py                           ← interactive setup wizard
 ├── resell_inventory.xlsx              ← live inventory tracker (gitignored)
 ├── resell_inventory_template.xlsx     ← blank template for new users
-├── requirements.txt                   ← Python deps for all scripts
+├── requirements.txt                   ← Python deps
 ├── skills/                            ← all skill docs live here
 │   ├── setup/SKILL.md                 ← AI-guided first-time setup
-│   ├── photo-inbox/SKILL.md           ← Telegram photo retrieval (fallback — poll bot is primary)
-│   ├── manage-listings/SKILL.md       ← daily listing monitoring
+│   ├── organize-photos/SKILL.md       ← photo intake, naming, dedup, cleanup
 │   ├── create-listing/SKILL.md        ← new listing creation (photos → published)
-│   ├── followup/SKILL.md              ← act on user's Telegram replies
-│   ├── send-summary/SKILL.md          ← format + send Telegram summary
-│   ├── telegram-bot/SKILL.md           ← single Telegram consumer: routing, batch research
-│   └── scheduled-runs/
-│       ├── morning-run.md             ← orchestration: photo inbox + listing check
-│       └── followup-run.md            ← orchestration: process user's replies
+│   ├── manage-listings/SKILL.md       ← on-demand listing monitoring
+│   └── review-issues/SKILL.md         ← review and fix skill issues
 ├── scripts/
 │   ├── update_inventory.py            ← CLI tool for the spreadsheet
-│   ├── convert_heic.py               ← converts iPhone HEIC photos → JPEG
-│   ├── telegram_poll_bot.py           ← single Telegram consumer: photos, batch mode, message routing
-│   ├── install-listener.sh           ← installs poll bot as macOS service
-│   └── com.resellbot.telegram-poll-bot.plist ← launchd config
-├── logs/                              ← listener + Claude session logs (gitignored)
-├── notifications/                     ← Telegram API + Python modules
-│   ├── .env                           ← Telegram credentials (gitignored)
-│   ├── .env.example                   ← template
-│   ├── telegram.py                    ← raw Telegram Bot API
-│   ├── telegram_reader.py             ← read incoming text messages
-│   ├── photo_inbox.py                 ← photo message parsing (fallback)
-│   ├── reply_handler.py               ← match user's replies to pending actions
-│   ├── notifier.py                    ← notify(message) — main interface
-│   ├── consumed_updates.json          ← all updates consumed by poll bot (24hr rolling)
-│   └── pending_actions.json           ← written by morning run, consumed by followup
-├── photo-inbox/                       ← incoming photos from Telegram
-│   └── processed.json                 ← tracks which photos have been downloaded
-├── items/                             ← archived photos after listing created
-└── schedule-prompts/                  ← thin pointers for Cowork scheduled tasks
-    ├── morning.txt                    ← → skills/scheduled-runs/morning-run.md
-    └── followup.txt                   ← → skills/scheduled-runs/followup-run.md
+│   └── convert_heic.py               ← converts iPhone HEIC photos → JPEG
+├── logs/issues/                       ← per-skill issue logs (gitignored)
+├── photo-inbox/                       ← incoming photos (staging area)
+└── items/                             ← archived photos after listing created
 ```
 
 ---
@@ -94,23 +82,10 @@ resell-bot/
 | Skill | When to use | How to invoke |
 |-------|-------------|---------------|
 | `skills/setup/SKILL.md` | First-time setup — walk a new user through full configuration | Read and follow the SKILL.md |
-| `skills/photo-inbox/SKILL.md` | Check Telegram for new photos the user sent from their phone | Read and follow the SKILL.md |
-| `skills/manage-listings/SKILL.md` | Daily monitoring — check listings, respond to buyers, send alerts | Read and follow the SKILL.md |
+| `skills/organize-photos/SKILL.md` | User provides photos, or audit/clean up existing photo folders | Read and follow the SKILL.md |
 | `skills/create-listing/SKILL.md` | Create a new listing — photos, pricing research, description, posting | Read and follow the SKILL.md |
-| `skills/followup/SKILL.md` | Act on the user's Telegram replies to pending decisions | Read and follow the SKILL.md |
-| `skills/send-summary/SKILL.md` | Format and send the post-run Telegram summary | Read and follow the SKILL.md |
-| `skills/telegram-bot/SKILL.md` | Single Telegram consumer: photo intake, batch research, message routing | Runs via `scripts/telegram_poll_bot.py` |
-
-### Scheduled runs
-
-The `skills/scheduled-runs/` directory has orchestration docs that chain the skills together. Scheduled prompts in `schedule-prompts/` are thin pointers — all logic lives in the code.
-
-| Run | Orchestration doc | Scheduled prompt |
-|-----|-------------------|-----------------|
-| Morning (daily) | `skills/scheduled-runs/morning-run.md` | `schedule-prompts/morning.txt` |
-| Followup (1hr later) | `skills/scheduled-runs/followup-run.md` | `schedule-prompts/followup.txt` |
-
-The poll bot handles real-time photo intake from Telegram. If running as a scheduled task, **check the filesystem** for unprocessed photos in `photo-inbox/` (not Telegram directly), then run manage-listings. If new photos are found, hand off each item to create-listing for publishing.
+| `skills/manage-listings/SKILL.md` | Check listings for activity, respond to buyers, review offers | Read and follow the SKILL.md |
+| `skills/review-issues/SKILL.md` | Review problems logged by other skills, identify patterns, suggest fixes | Read and follow the SKILL.md |
 
 ---
 
@@ -155,10 +130,9 @@ python3 scripts/convert_heic.py /path/to/photos/ /path/to/output/
 
 | MCP | Purpose | Required for |
 |-----|---------|-------------|
-| **Gmail MCP** | Read emails only (cannot send) | Optional — reading inbox for marketplace notifications |
-| **Browser / Chrome** | Navigate eBay and Facebook Marketplace | All skills — listing checks, publishing, Telegram API |
+| **Browser / Chrome** | Navigate eBay and Facebook Marketplace | All skills — listing checks, publishing |
 
-Confirm Chrome is active before the first scheduled run. Notifications are sent via Telegram (see `notifications/` — no email MCP needed for sending).
+Confirm Chrome is active before any marketplace interaction.
 
 ### Fixing Chrome timeouts
 
@@ -174,51 +148,23 @@ tabs_context_mcp(createIfEmpty: true)   → returns tabId e.g. 73648610
 navigate(url: "https://...", tabId: 73648610)
 ```
 
-This resolved a full Chrome timeout loop in a scheduled run on 2026-03-15.
-
 ---
 
-## Telegram notifications
+## Issue Logging
 
-The `notifications/` subdirectory handles all Telegram communication — sending alerts, reading the user's replies, and downloading photos.
+Every skill logs problems to `logs/issues/<skill-name>.json`. Each entry:
 
-```
-notifications/
-├── .env              ← Telegram credentials (gitignored)
-├── .env.example      ← template — shows what keys are required
-├── telegram.py       ← raw Telegram Bot API call
-├── telegram_reader.py← read incoming text messages
-├── photo_inbox.py    ← read incoming photo messages (fallback)
-├── reply_handler.py  ← match user's replies to pending actions
-├── notifier.py       ← main interface: loads .env → Telegram
-├── consumed_updates.json ← ALL updates consumed by poll bot (24hr rolling)
-└── pending_actions.json ← written by morning run, consumed by followup
+```json
+{
+  "timestamp": "ISO 8601",
+  "type": "category",
+  "description": "what happened",
+  "resolution": "what was done, or 'unresolved'",
+  "item": "item folder name if applicable"
+}
 ```
 
-**Usage from any script in this repo:**
-```python
-from notifications.notifier import notify
-
-notify("Your listing got a new offer: $380 — check it out")
-```
-
-Credentials flow: `.env` → Telegram bot token + chat ID → message sent directly via Telegram Bot API.
-
-The `.env` is gitignored. On a new machine, run `python3 setup.py` to create it.
-
----
-
-## Photo inbox — Telegram photo pipeline
-
-The poll bot (`scripts/telegram_poll_bot.py`) is the **single consumer** of all Telegram updates. It runs as a background macOS service and handles real-time photo intake, batch queuing, and message routing.
-
-**User's workflow:** Take photos → send to Telegram bot with a caption → send more items if needed → reply "go" → done.
-
-**Poll bot's workflow:** Queue items by caption → download photos to `photo-inbox/<item-name>/` → spawn one Claude session to research all items → update inventory with status "ready".
-
-The poll bot also saves every consumed update to `notifications/consumed_updates.json` (24-hour rolling window) so that other systems (followup skill, morning run) can read messages the bot already acknowledged.
-
-After a listing is created, photos move to `items/<item-name>/`. The photo-inbox skill (`skills/photo-inbox/SKILL.md`) is a **fallback** for when the poll bot isn't running. For scheduled runs, just check the filesystem for unprocessed photos.
+Use `skills/review-issues/SKILL.md` to review, identify patterns, and fix recurring problems.
 
 ---
 
@@ -226,15 +172,15 @@ After a listing is created, photos move to `items/<item-name>/`. The photo-inbox
 
 These are hard limits. Never override without explicit user approval:
 
-- **Never accept or decline an offer** — notify the user via Telegram with the offer amount and a recommendation, wait for them to decide
-- **Never finalize a sale** — notify the user and let them handle shipping/fulfillment
+- **Never accept or decline an offer** — present a recommendation and wait for the user to decide
+- **Never finalize a sale** — tell the user and let them handle shipping/fulfillment
 - **Never change a listing price** — suggest it, don't do it
 - **Never end or remove a listing**
 - **Never share the user's personal info** (phone, address) with buyers
 - **Never make pickup/meeting commitments**
 
 Routine actions that are fine autonomously:
-- Answer "is this still available?" messages
+- Answer "is this still available?" messages (active listings only)
 - Reply to questions covered by the listing (dimensions, condition, shipping)
 - Update `resell_inventory.xlsx`
 
@@ -247,7 +193,7 @@ Routine actions that are fine autonomously:
 2. If no interest after 1-2 weeks, lower toward the **Quick Sale** tier
 3. Never go below the Quick Sale price — that's the floor
 
-This means `selling.priority` in `config.yaml` sets the *starting* strategy, but the general rule is: start at market, lower if needed. Never race to the bottom on day one.
+Check `user-preferences.yaml → pricing` for the user's specific settings.
 
 ---
 
@@ -256,8 +202,6 @@ This means `selling.priority` in `config.yaml` sets the *starting* strategy, but
 All listing data lives in `resell_inventory.xlsx` — that is the source of truth. Read it at the start of every run.
 
 The eBay seller username is in `config.yaml` under `selling.ebay_username`.
-
-**Notify via:** Telegram (see `skills/send-summary/SKILL.md`)
 
 ---
 
@@ -274,3 +218,25 @@ Pull before running on a new machine:
 ```bash
 git pull
 ```
+
+---
+
+## Photo pipeline
+
+Photos flow through two directories:
+
+| Directory | Purpose |
+|-----------|---------|
+| `photo-inbox/` | Staging area — new photos land here for organization |
+| `items/` | Permanent home — photos move here after a listing is created |
+
+The `organize-photos` skill handles intake, HEIC conversion, folder naming, duplicate detection, and cleanup. The `create-listing` skill picks up from organized photos.
+
+### Folder naming convention
+```
+[item-type]-[key-descriptor]-[size-or-id]
+```
+All lowercase, hyphens, max ~30 chars. See `skills/organize-photos/SKILL.md` for full rules and examples.
+
+# currentDate
+Today's date is 2026-03-30.

@@ -8,6 +8,5 @@ openpyxl>=3.1.0
 Pillow>=10.0.0
 pillow-heif>=0.13.0
 
-# Telegram notifications (notifications/)
-requests>=2.31.0
-python-dotenv>=1.0.0
+# Configuration file parsing (config.yaml and user-preferences.yaml)
+pyyaml>=6.0

@@ -1,0 +1,117 @@
+# user-preferences.yaml — Your personal selling preferences
+# ---
+# Skills read this file to respect your choices. If a REQUIRED preference
+# is missing, Claude will stop and ask you before proceeding.
+#
+# Each preference is marked:
+#   required: true   — Claude MUST have an answer before acting
+#   required: false  — Claude uses the default if you haven't set one
+#
+# To change a preference, edit this file directly or tell Claude to update it.
+
+# ─── Identity ────────────────────────────────────────────────────────
+user:
+  name: ""                              # required: true — used in listings and communication
+
+# ─── Marketplace accounts ────────────────────────────────────────────
+accounts:
+  ebay_username: ""                     # required: true (if ebay is in marketplaces)
+  marketplaces:                         # required: true — which platforms to list on
+    - "ebay"
+    - "fb_marketplace"
+
+# ─── Pricing ─────────────────────────────────────────────────────────
+pricing:
+  priority: ""                          # required: true — "speed" or "price"
+                                        #   speed = optimize for quick sale
+                                        #   price = optimize for maximum profit
+
+  starting_tier: "market"               # required: false — default: "market"
+                                        #   Always list at Market Price first,
+                                        #   lower toward Quick Sale if no interest.
+
+  floor_behavior: "never_below_quick_sale"  # required: false
+                                        #   Never go below the Quick Sale price.
+
+  fb_discount: true                     # required: false — default: true
+                                        #   FB Marketplace price is 10-20% lower
+                                        #   than eBay (no fees, local pickup, buyers
+                                        #   expect deals).
+
+  stale_listing_days: 7                 # required: false — default: 7
+                                        #   After this many days with low engagement,
+                                        #   suggest a price reduction.
+
+# ─── Shipping ────────────────────────────────────────────────────────
+shipping:
+  default: "local_pickup_only"          # required: true
+                                        #   "local_pickup_only" — default for all listings
+                                        #   "offer_shipping" — include shipping option
+                                        #   If an item would benefit from shipping,
+                                        #   Claude will ask you first before enabling it.
+
+# ─── Listing preferences ────────────────────────────────────────────
+listings:
+  platform_selection: "auto"            # required: false — default: "auto"
+                                        #   "auto" = Claude picks the best platform(s)
+                                        #     based on item type and predicted price:
+                                        #     - Cheap/bulky (<$30) → FB only
+                                        #     - Rare/specialty → eBay primary
+                                        #     - Large furniture → FB primary
+                                        #     - Everything else → both
+                                        #   "both" = always list on both
+                                        #   "ask" = always ask the user
+
+  auto_reply_routine_questions: true    # required: false — default: true
+                                        #   Answer "is this still available?", dimensions,
+                                        #   condition, and other listing-covered questions
+                                        #   autonomously for active listings only.
+
+  description_structure:                # required: false — defaults shown
+    - "opening_line"                    #   What it is and why it's desirable
+    - "key_details_bullets"             #   Brand, model, condition, attributes
+    - "appeal_sentences"                #   1-2 sentences about features/history
+    - "shipping_note"                   #   Pickup/shipping info
+    - "honest_flaw_disclosure"          #   Any flaws — builds trust
+
+# ─── Photo organization ─────────────────────────────────────────────
+photos:
+  folder_naming: "auto"                 # required: false — default: "auto"
+                                        #   Format: [item-type]-[key-descriptor]-[size-or-id]
+                                        #   All lowercase, hyphens, max ~30 chars.
+                                        #   Claude names folders automatically using
+                                        #   this convention.
+
+  convert_heic: true                    # required: false — default: true
+                                        #   Automatically convert iPhone HEIC → JPEG.
+
+  detect_duplicates: true               # required: false — default: true
+                                        #   Flag duplicate or near-duplicate photos.
+
+  fix_misnamed_folders: true            # required: false — default: true
+                                        #   Detect folders that don't follow the naming
+                                        #   convention and rename them.
+
+  staging_dir: "photo-inbox"            # required: false — where new photos land
+  archive_dir: "items"                  # required: false — where photos go after listing
+
+# ─── Behavioral guardrails ───────────────────────────────────────────
+# These are HARD LIMITS. Claude never overrides without explicit approval.
+guardrails:
+  never_accept_or_decline_offers: true
+  never_finalize_sales: true
+  never_change_listing_price: true
+  never_end_or_remove_listing: true
+  never_share_personal_info: true
+  never_make_pickup_commitments: true
+
+# ─── Offer evaluation ───────────────────────────────────────────────
+offers:
+  floor_column: "Quick Sale $"          # required: false
+                                        #   Offers at or above this → recommend accept.
+                                        #   Below → suggest counter near the floor.
+
+# ─── Inventory ───────────────────────────────────────────────────────
+inventory:
+  file: "resell_inventory.xlsx"         # required: false
+  source_of_truth: true                 # The spreadsheet is always the canonical record.

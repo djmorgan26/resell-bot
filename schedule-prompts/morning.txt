@@ -1,9 +1,0 @@
-Run the daily marketplace check.
-
-Find the workspace:
-  find /sessions -name "resell_inventory.xlsx" 2>/dev/null | head -1 | xargs dirname
-
-Read [WORKSPACE]/CLAUDE.md to understand the project, its purpose, and all behavioral rules before doing anything else.
-
-Then read [WORKSPACE]/skills/scheduled-runs/morning-run.md and follow every step.
-Chrome browser tools are available.

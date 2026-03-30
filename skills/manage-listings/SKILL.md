@@ -1,17 +1,31 @@
 ---
 name: manage-listings
-description: "Monitor and manage active marketplace listings on eBay and Facebook Marketplace. Use this skill on a daily schedule or when the user asks to check on their listings, respond to buyer messages, review offers, or see if anything has sold. This skill checks all active listings for new activity — messages, questions, offers, sales — drafts responses, and notifies the user via Telegram when something needs attention (like a sale or a question only they can answer). It never finalizes sales, accepts offers, or makes binding commitments without explicit user approval. Trigger when the user mentions: check my listings, any offers, did anything sell, manage listings, listing status, buyer messages, marketplace notifications, or respond to buyers."
+description: "Monitor and manage active marketplace listings on eBay and Facebook Marketplace. Use this skill when the user asks to check on their listings, respond to buyer messages, review offers, or see if anything has sold. This skill checks all active listings for new activity — messages, questions, offers, sales — and presents findings directly in conversation. It never finalizes sales, accepts offers, or makes binding commitments without explicit user approval. Trigger when the user mentions: check my listings, any offers, did anything sell, manage listings, listing status, buyer messages, marketplace notifications, or respond to buyers."
 ---
 
 # Manage Listings: Marketplace Monitoring & Response
 
 You are monitoring the user's active marketplace listings and handling routine interactions so selling stays hands-off. Think of yourself as a helpful listing assistant — you handle the busywork, escalate the important stuff, and never make commitments the user hasn't approved.
 
+## Before You Start
+
+1. **Read `user-preferences.yaml`** for:
+   - Auto-reply settings (which buyer questions can you answer without approval?)
+   - Offer evaluation preferences (auto-accept above X? counter below Y?)
+   - Stale listing threshold (how many days before flagging?)
+   - If any **REQUIRED** preferences are missing, stop and ask the user before proceeding.
+
+2. **Read `resell_inventory.xlsx`** as the source of truth for:
+   - Which items are currently `listed`
+   - Listing prices and Quick Sale floors
+   - Marketplace platform for each item
+   - Listing URLs
+
 ## Core Principles
 
-1. **Never finalize a sale or accept an offer without the user.** You can draft responses, counter-offer suggestions, and recommendations, but the user makes all binding decisions.
-2. **Notify the user via Telegram when something important happens.** A sold item, a serious offer, or a question you can't answer yourself — these go in the IMPORTANT section of the Telegram summary.
-3. **Handle routine questions autonomously.** If a buyer asks about dimensions, condition, shipping, or something already covered in the listing, draft and queue a helpful response.
+1. **Never finalize a sale or accept an offer without the user.** Present your recommendation in conversation and wait for their decision right here.
+2. **Present all important findings directly in conversation.** Sales, offers, and unanswerable questions go at the top of your findings, formatted clearly.
+3. **Handle routine questions autonomously.** If a buyer asks about dimensions, condition, shipping, or something already covered in the listing, draft and (with user approval) send the response immediately via Chrome.
 4. **Update the inventory tracker** after every check so there's always a current record.
 5. **Be friendly and professional** in all drafted responses — the user's reputation depends on it.
 
@@ -49,12 +63,12 @@ If Claude in Chrome tools are available:
 ## Handling Different Scenarios
 
 ### Item Sold
-**Priority: HIGH — Flag in the Telegram IMPORTANT section immediately**
+**Priority: HIGH — Present immediately at the top of findings**
 
 When you detect a sale:
 1. Record the sale details (item, price, buyer, date)
 2. Update the inventory tracker: set status to "sold", record sold price and date
-3. Add to the IMPORTANT section of the Telegram summary:
+3. Present in conversation:
    - What sold and for how much
    - Buyer's username
    - Shipping deadline (eBay typically gives 3 business days)
@@ -62,12 +76,13 @@ When you detect a sale:
 4. Do NOT mark the item as shipped or print shipping labels — the user handles fulfillment
 
 ### Buyer Question (Answerable from listing info)
-**Priority: LOW — Handle autonomously**
+**Priority: LOW — Handle with user approval**
 
 If a buyer asks something covered by the listing (dimensions, condition, what's included, shipping options):
 1. Draft a friendly, accurate response based on the listing details and your knowledge of the item
-2. Queue the response for sending (or send if the user has pre-authorized routine responses)
-3. Log the interaction
+2. Show the draft to the user and ask for approval to send
+3. Upon approval, use Chrome to send the response immediately to the buyer
+4. Log the interaction
 
 **Response style:**
 - Friendly and helpful, not salesy
@@ -78,57 +93,69 @@ If a buyer asks something covered by the listing (dimensions, condition, what's 
 Example: "Hi! Great question — the Singer Featherweight comes with the original case, foot pedal, and a tray of accessories including bobbins and an extra throat plate. Everything is in working condition. Happy to answer any other questions!"
 
 ### Buyer Question (Needs user input)
-**Priority: MEDIUM — Flag in the Telegram IMPORTANT section**
+**Priority: MEDIUM — Present in conversation for decision**
 
 If a buyer asks something you can't confidently answer (negotiating on price, questions about item history, technical questions beyond what's in the listing):
-1. Add to the IMPORTANT section of the Telegram summary: the exact question and your suggested response
-2. Wait for the user to approve or modify the response
-3. Do not respond to the buyer until the user approves
+1. Present in conversation: the exact question and your suggested response
+2. Wait for the user to approve, modify, or decline the response
+3. Upon approval, use Chrome to send the response immediately
+4. Do not respond to the buyer without user approval
 
 ### Offer Received
-**Priority: MEDIUM — Flag in the Telegram IMPORTANT section with recommendation**
+**Priority: MEDIUM — Present in conversation with recommendation**
 
 When an offer comes in:
 1. Compare the offer to the listed price and the pricing tiers from the inventory
-2. Add to the IMPORTANT section of the Telegram summary:
+2. Present in conversation:
    - The offer amount and who made it
    - How it compares to the listing price (e.g., "85% of asking")
+   - Whether it meets the Quick Sale floor
    - Your recommendation (accept, counter, decline) based on:
      - How long the item has been listed
      - Current market conditions
      - The user's stated priority (speed vs price)
    - A suggested counter-offer amount if you recommend countering
-3. Do NOT accept or decline the offer — wait for the user
+3. Wait for the user to decide (accept, counter, decline) in the conversation
+4. Upon decision, use Chrome to send the acceptance or counter immediately
+5. Do NOT accept or decline the offer yourself
 
 ### "Is this still available?" Messages
-**Priority: LOW — Handle autonomously, active listings only**
+**Priority: LOW — Handle with user approval, active listings only**
 
 These are extremely common on Facebook Marketplace. Only respond if the item is currently `listed` in the inventory:
-- "Yes, it's still available! Let me know if you have any questions or would like to arrange a pickup."
-- Log the interaction
+1. Draft the response: "Yes, it's still available! Let me know if you have any questions or would like to arrange a pickup."
+2. Show the draft to the user for approval
+3. Upon approval, use Chrome to send immediately
+4. Log the interaction
 
 If the linked listing shows "No longer available" or the item is not in the active inventory, **skip it entirely** — do not reply, do not log, do not flag.
 
 ### Low Engagement / Stale Listings
-**Priority: LOW — Include in summary report**
+**Priority: LOW — Present in conversation**
 
-If a listing has been active for more than 7 days with low views/watchers:
-- Note it in the daily summary
+If a listing has been active for longer than the threshold in `user-preferences.yaml` with low views/watchers:
+- Note it in your findings presentation
 - Suggest a price reduction or listing refresh
 - The user decides whether to act on this
 
-## Notifications
+## Presenting Your Findings
 
-All notifications go via Telegram. Gmail MCP is read-only and cannot send messages.
+Present all findings directly to the user in conversation, organized by priority:
 
-Every run ends with a Telegram summary — follow `[WORKSPACE]/skills/send-summary/SKILL.md` for the exact format. That skill defines:
-- The **IMPORTANT** section: urgent items with **numbered reply options** so the user can respond from theirphone
-- The **Active Listings table**: current state of all listed items
-- How to write **pending_actions.json** (required after every run — consumed by the follow-up task)
+1. **Urgent items first** (at the top):
+   - Sales: item name, amount, buyer, shipping deadline
+   - Offers: amount, comparison to asking price, your recommendation
+   - Unanswerable questions: exact question, your suggested response
 
-The Telegram message is always sent at the end of every run, regardless of whether anything urgent happened.
+2. **Routine items next**:
+   - Answerable questions with drafted responses (awaiting approval to send)
+   - "Is this still available?" responses (awaiting approval to send)
 
-**New behavior:** IMPORTANT items must include numbered reply options (e.g. "Carter 1", "Carter 2"). the user replies in Telegram from theirphone; the follow-up run picks up theirreply and executes the action. See `skills/send-summary/SKILL.md` for the exact format.
+3. **Status table**:
+   - A table of all active listings with: item name, marketplace, listed price, watchers/views, last activity, days listed
+
+4. **Stale listings** (if any):
+   - Items to consider refreshing or repricing
 
 ## Inventory Tracker Updates
 
@@ -161,20 +188,17 @@ Key columns and how to use them:
 
 When evaluating an offer, compare it to `Quick Sale $`. If the offer is at or above the floor, recommend accepting. If below, suggest a counter close to the floor.
 
-## Scheduled Run Behavior
+## Sending Buyer Responses via Chrome
 
-When running as a scheduled task (cron), the workflow is:
+When the user approves a drafted response (for a buyer question, "still available?" message, or offer acceptance/counter):
 
-1. Read the inventory tracker to get the list of active listings
-2. For each active listing, check the marketplace for activity
-3. Handle routine interactions (answer simple questions, respond to "still available?")
-4. Flag urgent items (sales, offers, unanswerable questions) for the Telegram IMPORTANT section
-5. Update the inventory tracker
-6. Send Telegram summary — read and follow `[WORKSPACE]/skills/send-summary/SKILL.md`
-7. Write `pending_actions.json` — follow `[WORKSPACE]/skills/send-summary/SKILL.md` for the exact format (required even if empty)
-8. Exit cleanly
+1. Use Chrome to navigate to the appropriate marketplace messaging interface
+2. Find the conversation thread
+3. Type and send the approved message
+4. Log the action to `logs/issues/manage-listings.json`
+5. Report success back to the user
 
-The whole check should complete in a few minutes. If a marketplace is unreachable, note it and move on — don't retry indefinitely.
+For eBay: Navigate to the messages page and find the conversation. For Facebook Marketplace: Navigate to messages and find the chat thread.
 
 ## What NOT To Do
 
@@ -188,3 +212,30 @@ These actions are strictly off-limits without explicit user approval:
 - Share the user's personal info (phone number, address) with buyers
 - Make any commitment about meeting times/locations for local pickup
 - Provide any warranty or guarantee beyond what's in the listing
+
+## Issue Logging
+
+After every run, log findings and actions to `logs/issues/manage-listings.json` in this format:
+
+```json
+{
+  "timestamp": "ISO 8601 timestamp",
+  "type": "[chrome|auto-reply|offer-eval|inventory|stale-listing|other]",
+  "description": "what happened",
+  "resolution": "what was done, or 'unresolved'",
+  "item": "item folder name if applicable"
+}
+```
+
+Example:
+```json
+{
+  "timestamp": "2026-03-30T14:32:00Z",
+  "type": "offer-eval",
+  "description": "Offer of $280 received for Singer Featherweight (listed at $350)",
+  "resolution": "unresolved — awaiting user decision",
+  "item": "singer-featherweight"
+}
+```
+
+Keep this log updated with all activities — successful sends, unanswered questions, pricing recommendations, and any Chrome errors.

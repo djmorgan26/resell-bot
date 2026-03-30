@@ -2,14 +2,18 @@ __pycache__/
 *.pyc
 *.pyo
 .DS_Store
-.env
 *.log
 .venv/
+.claude/
 
 # Personal data — gitignored so others get a clean slate on clone
 resell_inventory.xlsx
 config.yaml
+user-preferences.yaml
 
-# Listener state + logs
-logs/
-photo-inbox/.listener_offset
+# Issue logs (generated per-session, not tracked)
+logs/issues/*.json
+
+# Photo staging (user's photos, not tracked)
+photo-inbox/
+!photo-inbox/.gitkeep

@@ -7,6 +7,16 @@ description: "AI-assisted workflow for selling personal items on online marketpl
 
 You are helping the user sell personal items on online marketplaces. The goal is to make selling feel frictionless — from photo to published listing in minutes.
 
+## Before You Start
+
+Read `user-preferences.yaml` to check:
+- **Pricing strategy** (speed vs. price optimization)
+- **Shipping preferences** (local pickup only, or willing to ship)
+- **Marketplace preferences** (which platforms to list on)
+- **Category preferences** (any item types the user prefers or avoids)
+
+If any **REQUIRED** preferences are missing (pricing strategy, shipping, marketplace), stop and ask the user to update `user-preferences.yaml` using the setup wizard before continuing.
+
 ## Overview
 
 The workflow has 6 stages. You can start at any stage depending on what the user provides:
@@ -20,15 +30,9 @@ The workflow has 6 stages. You can start at any stage depending on what the user
 
 ## Stage 1: Ingest Photos
 
-If photos are HEIC format, convert them to JPEG first:
+If photos need organization, conversion (HEIC → JPEG), or deduplication, run `skills/organize-photos/SKILL.md` first.
 
-```bash
-python3 [WORKSPACE]/scripts/convert_heic.py <input_dir> <output_dir>
-```
-
-The script converts all .heic files to .jpeg while preserving quality. The output directory will contain web-ready images.
-
-Then use Claude's vision to look at every photo. Read each image file to examine it visually. Take note of:
+Once photos are ready, use Claude's vision to look at every photo. Read each image file to examine it visually. Take note of:
 - What the item is (broad category first, then specifics)
 - Any visible brand names, logos, labels, model numbers, or serial numbers
 - Condition indicators (scratches, wear, stains, missing parts)
@@ -129,7 +133,7 @@ When listing on both, note that **prices can differ** — FB Marketplace is typi
 
 **Default to local pickup only** on all listings unless the user explicitly says otherwise. This applies to both eBay and FB Marketplace.
 
-If an item would benefit from offering shipping (e.g. small, lightweight, rare/niche item that has few local buyers), **notify the user via Telegram first** explaining why before enabling shipping. Don't just add shipping on your own.
+If an item would benefit from offering shipping (e.g. small, lightweight, rare/niche item that has few local buyers), **mention this to the user in conversation** explaining why before enabling shipping. Don't just add shipping on your own.
 
 On eBay, set listings to "Local Pickup Only." On FB Marketplace, local pickup is already the default.
 
@@ -211,8 +215,6 @@ rug-30-12-x-57                                                   ← no descript
 
 If the item should go on multiple marketplaces (see Stage 5 guidance), publish to **each one**. Create separate inventory entries or update the same entry with multiple listing URLs.
 
-Two modes depending on what's available:
-
 ### Mode A: Browser-assisted (Claude in Chrome)
 If browser tools are available:
 1. Navigate to the first marketplace (eBay sell page or Facebook Marketplace create listing)
@@ -221,6 +223,9 @@ If browser tools are available:
 4. Set the price (use marketplace-appropriate price — FB can be slightly lower)
 5. Pause before final submission so the user can review
 6. **Repeat for the second marketplace** if listing on both
+7. Report results directly to the user: which marketplaces were posted to, and the listing URLs
+
+**If Chrome issues occur:** Stop, describe the problem to the user in conversation, and ask for help before proceeding further.
 
 ### Mode B: Guided manual posting
 If no browser access:
@@ -228,6 +233,7 @@ If no browser access:
 2. If listing on both platforms, provide **separate drafts** for each (titles/prices may differ)
 3. List the photos to upload in order
 4. Remind the user of any marketplace-specific settings (shipping, returns, etc.)
+5. After the user confirms posting is complete, update the inventory tracker
 
 ## Inventory Management
 
@@ -254,6 +260,53 @@ When the user has multiple items (like folders of photos for different items), p
 4. Present all pricing at once for the user to review
 5. Generate all listings
 6. Help publish one at a time (needs user approval for each)
+
+## Issue Logging
+
+If you encounter any problems during the listing creation process, log them to `logs/issues/create-listing.json` for tracking and review.
+
+**Format:**
+```json
+{
+  "timestamp": "2026-03-30T14:45:00Z",
+  "type": "[research|pricing|description|publish|chrome|inventory|other]",
+  "description": "what happened",
+  "resolution": "what was done, or 'unresolved'",
+  "item": "item folder name if applicable"
+}
+```
+
+**Python snippet (use at any point in the skill):**
+```python
+import json
+from datetime import datetime
+from pathlib import Path
+
+issues_file = Path("logs/issues/create-listing.json")
+issues_file.parent.mkdir(parents=True, exist_ok=True)
+
+# Read existing issues (or start with empty list)
+try:
+    with open(issues_file, "r") as f:
+        issues = json.load(f)
+except (FileNotFoundError, json.JSONDecodeError):
+    issues = []
+
+# Append new issue
+issues.append({
+    "timestamp": datetime.utcnow().isoformat() + "Z",
+    "type": "chrome",
+    "description": "eBay form fields not loading",
+    "resolution": "unresolved",
+    "item": "persian-pile-rug-29x35"
+})
+
+# Write back
+with open(issues_file, "w") as f:
+    json.dump(issues, f, indent=2)
+```
+
+---
 
 ## Tips for Different Item Types
 
